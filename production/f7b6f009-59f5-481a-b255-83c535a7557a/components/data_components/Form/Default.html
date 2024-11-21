@@ -1,0 +1,65 @@
+<section class="form-wrapper container" :class="this.model?.cssClass" :id="'comp-'+this.model.id">
+    <div v-if="this.model.header !== null && this.model.header !=''"
+         :class="['d-flex', 'flex-wrap', 'mb-3 pb-3 header-wrap', getAlignmentClass(model.alignment)]">
+        <h2 class="h4 fw-bold mb-0">{{ this.model.header }}</h2>
+    </div>
+    <div class="row position-relative">
+        <div v-if="this.toastSuccessClass == 'show' || this.toastErrorClass == 'show'" class="d-flex justify-content-center position-absolute col-12">
+            <div class="toast" :class="toastSuccessClass" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-success justify-content-end text-white">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close" v-on:click="clearForm()"><span class="d-none">##Close##</span></button>
+                </div>
+                <div class="toast-body text-center text-success">{{data.successMessage}}</div>
+            </div>
+            <div class="toast" :class="toastErrorClass" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-danger justify-content-end text-white">
+                    <span class="me-auto">##oops##</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close" v-on:click="clearForm()"><span class="d-none">##Close##</span></button>
+                </div>
+                <div class="toast-body text-danger text-error">##toastError##</div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <form v-if="fields!=null && fields.length>0" @submit.prevent="checkForm" novalidate _lpchecked="1" :id="this.formId" class="d-flex flex-wrap justify-content-between">
+                <div v-for="(field, index) in fields" class="single-field" :class="getClass(field.type, index)">
+                    <div v-if="!field.isHidden && field.type==1">
+                        <label v-if="field.label!==null" class="form-label d-flex align-items-center" :for="field.name+'-'+index"><span v-html="field.label"></span><span v-if="field.required" class="text-danger ps-1">*</span></label>
+                        <input class="form-control" :id="field.name+'-'+index" :name="field.name+'-'+index" type="text" v-model="field.value" placeholder="" autocomplete="off">
+                        <p v-if="field.hasValidationError===true && field.validationMessage!==null" class="text-danger"><span v-html="field.validationMessage"></span></p>
+                    </div>
+                    <div v-if="!field.isHidden && field.type==2">
+                        <label v-if="field.label!==null" class="form-label d-flex align-items-center" :for="field.name+'-'+index"><span v-html="field.label"></span><span v-if="field.required" class="text-danger ps-1">*</span></label>
+                        <textarea class="form-control" :id="field.name+'-'+index" :name="field.name+'-'+index" v-model="field.value" rows="6" placeholder="" autocomplete="off"></textarea>
+                        <p v-if="field.hasValidationError===true && field.validationMessage!==null" class="text-danger"><span v-html="field.validationMessage"></span></p>
+                    </div>
+                    <div v-if="!field.isHidden && field.type==3">
+                        <label v-if="field.label!==null" class="form-label d-flex align-items-center" :for="field.name+'-'+index"><span v-html="field.label"></span><span v-if="field.required" class="text-danger ps-1">*</span></label>
+                        <input class="form-control" :id="field.name+'-'+index" :name="field.name+'-'+index" type="email" v-model="field.value" :class="field.hasValidationError?'is-invalid':''" placeholder="" autocomplete="on">
+                        <p v-if="field.hasValidationError===true && field.validationMessage!==null" class="text-danger"><span v-html="field.validationMessage"></span></p>
+                        <p v-if="this.isInvalidEmail" class="invalid-feedback" style="display: block">##invalidEmailAddress##</p>
+                    </div>
+                    <div v-if="!field.isHidden && field.type==4">
+                        <label v-if="field.label!==null" class="form-label d-flex align-items-center" :for="field.name+'-'+index"><span v-html="field.label"></span><span v-if="field.required" class="text-danger ps-1">*</span></label>
+                        <input class="form-control" :name="field.name+'-'+index" type="file" :class="field.hasValidationError?'is-invalid':''" :id="field.name+'-'+index" placeholder="" autocomplete="off" multiple @change="uploadChange($event, field)">
+                        <p v-if="field.hasValidationError===true && field.validationMessage!==null" class="text-danger"><span v-html="field.validationMessage"></span></p>
+                        <p v-if="this.isInvalid" class="invalid-feedback" style="display: block"> ##invalidFileType## </p>
+                    </div>
+                    <div v-if="!field.isHidden && field.type==5" class="checkbox-wrap">
+                        <input class="form-control" :id="field.name+'-'+index" :name="field.name+'-'+index" type="checkbox" v-model="field.value">
+                        <label v-if="field.label!==null" class="form-label d-flex align-items-center" :for="field.name+'-'+index"><span v-html="field.label"></span><span v-if="field.required" class="text-danger ps-1">*</span></label>
+                        <p v-if="!field.value && field.validationMessage!==null && checkActivate" class="text-danger"><span v-html="field.validationMessage"></span></p>
+                    </div>
+                </div>
+                <div v-if="this.showReCaptcha" class="g-recaptcha" :data-sitekey="key"></div><!--reCaptcha v2-->
+                <span v-if="this.showReCaptcha" class="text-danger" :style="captchaErrorStyle">##CaptchaValidationMessage##</span>
+                <div class="ms-auto">
+                    <button @click="this.clearForm()" type="button" class="btn"><small>##Clear##</small></button>
+                    <button class="btn btn-primary py-2 px-3" type="submit" formnovalidate="formnovalidate">
+                        <span> {{this.model.buttonText}}</span>
+                        <span :class="{hidden:!isSaving}" class="spinner-border spinner-border-sm ps-2" role="status" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

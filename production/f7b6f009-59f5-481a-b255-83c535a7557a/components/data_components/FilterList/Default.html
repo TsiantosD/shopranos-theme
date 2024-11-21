@@ -1,0 +1,461 @@
+<section :id="'comp-'+this.model.id" :class="this.model?.cssClass" class="container-md filterlist">
+
+    <!-- Header & Description -->
+    <div class="filterlist-header">
+        <h1 class="filterlist-header__title h4">{{this.title}}</h1>
+        <div v-if="this.description != null" class="filterlist-header__description" v-html="this.description"></div>
+    </div>
+
+    <!-- Horizontal Filters -->
+    <div v-if="this.filterData !== null && this.filterData.filters.length > 0 && filtersPosition == 1" class="filterlist-filterstab">
+        <div class="filters-btn d-lg-none" :class="showFilters ? 'mb-3' : ''">
+            <button class="btn btn-primary d-flex align-items-center" @click="toggleFilters"><span class="s-filters"></span><span class="ms-2">##Filters##</span></button>
+        </div>
+        <div id="shop-sidebar" :class="showFilters ? 'd-block' : 'd-none d-lg-block'">
+            <div class="">
+                <div class="tab">
+                    <template v-for="(filterGroup, index) in this.filterData.filters" v-bind:key="index">
+                        <div v-if="filterGroup.key === 'PathCategory'" class="tablinks" @click="tabFilter(index)" :data-link="'filter-'+index" :class="[{'open': (index === 0)}]">##Categories##</div>
+                        <div v-else-if="filterGroup.key === 'Availability'" class="tablinks" @click="tabFilter(index)" :data-link="'filter-'+index" :class="[{'open': (index === 0)}]">##Availability##</div>
+                        <div v-else-if="filterGroup.key !== 'priceid' && filterGroup.key !== 'retailPriceId'" class="tablinks" @click="tabFilter(index)" :data-link="'filter-'+index" :class="[{'open': (index === 0)}]">{{filterGroup.name}}</div>
+                    </template>
+                </div>
+                <template v-for="(filterGroup, index) in this.filterData.filters">
+                    <div v-if="filterGroup.key !== 'priceid' && filterGroup.key !== 'retailPriceId'" class="tabcontent widget widget-filter" :id="'filter-'+index" :class="[{'open': (index === 0)}]">
+                        <ul class="widget-list widget-filter-list list-unstyled" data-simplebar data-simplebar-auto-hide="false">
+                            <li v-for="(value, index) in filterGroup.values" v-bind:key="value" class="widget-filter-item d-flex justify-content-between align-items-center">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" v-on:change="this.sendFilterRequest(1)" :disabled="value.count==0" v-model="value.selected" :id="'filter-'+value.slug">
+                                    <label class="form-check-label widget-filter-item-text" for="">{{value.name}}</label>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Settings if Horizontal Filters are active-->
+    <div v-if="filtersPosition == 1 && (this.model.showSearch || (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) || (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1))" class="filterlist-settings">
+        <div class="row">
+            <!-- Search -->
+            <div v-if="this.model.showSearch" class="filterlist-search" :class="[{'col-12' : !(this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length >
+                0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                {'col-md-5' : (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                {'col-md-4' : !(this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                {'col-md-5' : (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                ]">
+                <input v-model="inputText" @input="handleInputChange" placeholder='##SearchForProducts##' class="form-control">
+                <span class="s-search large"></span>
+            </div>
+
+            <!-- Sort & Page Size -->
+            <div v-if="this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)" class="filterlist-sorting" :class="[
+                 {'col-md-7 ms-auto': !(this.model.showSearch) && !(this.model?.previewOptions !==null && this.model?.previewOptions?.length>
+                1)},
+                {'col-9 col-md-5': (this.model.showSearch) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                {'col-7 ms-auto': !(this.model.showSearch) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                {'col-6 ms-auto': (this.model.showSearch) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)}]">
+                <div class="row">
+                    <!-- Sort Order -->
+                    <div v-if="(this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) && (IsPriceSortAllowed || !IsPriceSortTheOnlyOption)" class="filterlist-sorting__order" :class="this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0 ? 'col-8' : 'col-lg-12' ">
+                        <div v-if="this.model?.sortOptions !== null && this.model?.sortOptions.length > 0" class="d-flex" :class="[
+                             {'ms-auto' : this.model.showSearch },
+                             {'col-md-5 ms-auto' : (!(this.model.showSearch) && (this.model?.previewOptions !==null && this.model?.previewOptions?.length>
+                            1)) || ((this.model.showSearch) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)) },
+                            {'col-md-7 ms-auto' : !((!(this.model.showSeafsetPageSizerch) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)) || ((this.model.showSearch) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1))) }
+                            ]">
+                            <select class="form-select" id="sorting" v-on:change="setSortOrder($event)">
+                                <option disabled selected>##Sort##</option>
+                                <template v-for="option in this.model?.sortOptions">
+                                    <template v-if="option=='Title'">
+                                        <option value="+Title">##TitleAsc##</option>
+                                        <option value="-Title">##TitleDesc##</option>
+                                    </template>
+                                    <template v-else-if="option=='Price' && IsPriceSortAllowed">
+                                        <option value="+RetailPrice">##PriceAsc##</option>
+                                        <option value="-RetailPrice">##PriceDesc##</option>
+                                    </template>
+                                    <template v-else-if="option=='SortDate'">
+                                        <option value="+SortDate">##SortDateAsc##</option>
+                                        <option value="-SortDate">##SortDateDesc##</option>
+                                    </template>
+                                </template>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Page Size -->
+                    <div v-if="this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0" class="filterlist-sorting__pagesize" :class="[
+                         {'col-4': this.model?.sortOptions !==null && this.model?.sortOptions.length>
+                        0},
+                        {'col-lg-3 ms-auto': !(this.model?.sortOptions !== null && this.model?.sortOptions.length > 0)},
+                        ]">
+                        <div class="col-12 d-flex">
+                            <select class="form-select" id="pageSize" v-on:change="setPageSize($event)">
+                                <template v-for="option in this.model?.pageSizeOptions">
+                                    <option :value="option" :selected="this.model?.pageSize == option">{{option}}</option>
+                                </template>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Views -->
+            <div v-if="this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1" class="filterlist-views" :class="[
+                 {'col-1 ms-auto': !(this.model.showSearch) && !(this.filterData !=null && (this.model?.sortOptions !==null && this.model?.sortOptions.length>
+                0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0))},
+                {'col-3 col-md-1': (this.model.showSearch) && (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0))},
+                {'col-1': !(this.model.showSearch) && (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0))},
+                {'col-1 ms-auto': (this.model.showSearch) && !(this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0))},
+                ]">
+                <div class="row">
+                    <template v-for="(option, index) in this.model?.previewOptions">
+                        <div class="col-6" :class="option==this.DisplayModeEnum.List ? 'preview-list' : 'preview-grid'">
+                            <a v-if="option==this.DisplayModeEnum.List" href="#" v-on:click.prevent="this.changeDisplayMode($event, this.DisplayModeEnum.List)" role="button">
+                                <span class="s-list medium"></span>
+                            </a>
+                            <a v-else href="#" v-on:click.prevent="this.changeDisplayMode($event, this.DisplayModeEnum.Grid)" role="button">
+                                <span class="s-grid medium"></span>
+                            </a>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="filterlist-content row gap-4 gap-lg-0">
+
+        <!-- Vertical Filters -->
+        <aside v-if="this.filterData !== null && this.filterData.filters.length > 0 && filtersPosition == 0" class="filterlist-content__sidebar col-lg-4">
+            <div class="filters-btn d-lg-none" :class="showFilters ? 'mb-3' : ''">
+                <button class="btn btn-primary d-flex align-items-center" @click="toggleFilters"><span class="s-filters"></span><span class="ms-2">##Filters##</span></button>
+            </div>
+            <div id="shop-sidebar" :class="showFilters ? 'd-block' : 'd-none d-lg-block'">
+                <div class="">
+                    <div v-for="filterGroup in this.filterData.filters" class="widget widget-filter border-bottom open">
+                        <h3 v-if="filterGroup.key === 'PathCategory'" class="widget-title p" @click="toggleFilter">##Categories##</h3>
+                        <h3 v-else-if="filterGroup.key === 'Availability'" class="widget-title p" @click="toggleFilter">##Availability##</h3>
+                        <h3 v-else-if="filterGroup.key === 'brandid'" class="widget-title p" @click="toggleFilter">##Brands##</h3>
+                        <h3 v-else-if="filterGroup.key === 'retailPriceId'" class="widget-title p" @click="toggleFilter">##Price##</h3>
+                        <h3 v-else-if="filterGroup.key !== 'priceid'" class="widget-title p" @click="toggleFilter">{{filterGroup.name}}</h3>
+                        <ul v-if="filterGroup.key !== 'priceid' || filterGroup.key !=='retailPriceId'" class="widget-list widget-filter-list list-unstyled" data-simplebar data-simplebar-auto-hide="false">
+                            <li v-for="(value, index) in filterGroup.values" v-bind:key="value" class="widget-filter-item d-flex justify-content-between align-items-center">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" v-on:change="this.sendFilterRequest(1)" :disabled="value.count==0" v-model="value.selected" :id="'filter-'+value.slug">
+                                    <label class="form-check-label widget-filter-item-text" for="">{{value.name}}</label>
+                                </div>
+                                <span class="widget-filter-item__count">{{value.count}}</span>
+                            </li>
+                        </ul>
+                        <template v-if="filterGroup.key =='retailPriceId'">
+                            <div class="retail-price-slider" data-step="1">
+                                <div class="range-slider-ui"></div>
+                                <div class="d-none mt-2 mb-3 justify-content-between">
+                                    <div class="w-50">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">{{this._getCurrencySymbol()}}</span>
+                                            <input class="form-control range-slider-value-min" v-model="this.minRetailPrice" v-on:change="retailPriceChanged()" type="text" data-id="filter-retailPrice">
+                                        </div>
+                                    </div>
+                                    <div class="w-50d">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">{{this._getCurrencySymbol()}}</span>
+                                            <input class="form-control range-slider-value-max" v-model="this.maxRetailPrice" v-on:change="retailPriceChanged()" type="text" data-id="filter-retailPrice">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Products -->
+        <section class="filterlist-content__container" :class="this.filterData !== null && this.filterData.filters.length > 0 && filtersPosition == 0 ? 'col-lg-8' : 'col-lg-12' ">
+
+            <!-- Page Settings if Vertical Filters are active -->
+            <div v-if="filtersPosition == 0 && (this.model.showSearch || (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) || (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1))" class="filterlist-settings">
+                <div class="row">
+                    <!-- Search -->
+                    <div v-if="this.model.showSearch" class="filterlist-search" :class="[{'col-12' : !(this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length >
+                        0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                        {'col-md-5' : (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                        {'col-md-4' : !(this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                        {'col-md-5' : (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                        ]">
+                        <input v-model="inputText" @input="handleInputChange" placeholder='##SearchForProducts##' class="form-control">
+                        <span class="s-search large"></span>
+                    </div>
+
+                    <!-- Sort & Page Size -->
+                    <div v-if="this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0)" class="filterlist-sorting" :class="[
+                         {'col-md-7 ms-auto': !(this.model.showSearch) && !(this.model?.previewOptions !==null && this.model?.previewOptions?.length>
+                        1)},
+                        {'col-9 col-md-5': (this.model.showSearch) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                        {'col-7 ms-auto': !(this.model.showSearch) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)},
+                        {'col-6 ms-auto': (this.model.showSearch) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)}]">
+                        <div class="row">
+                            <!-- Sort Order -->
+                            <div v-if="(this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) && (IsPriceSortAllowed || !IsPriceSortTheOnlyOption)" class="filterlist-sorting__order" :class="this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0 ? 'col-8' : 'col-lg-12' ">
+                                <div v-if="this.model?.sortOptions !== null && this.model?.sortOptions.length > 0" class="d-flex" :class="[
+                                     {'ms-auto' : this.model.showSearch },
+                                     {'col-md-5 ms-auto' : (!(this.model.showSearch) && (this.model?.previewOptions !==null && this.model?.previewOptions?.length>
+                                    1)) || ((this.model.showSearch) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)) },
+                                    {'col-md-7 ms-auto' : !((!(this.model.showSeafsetPageSizerch) && (this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1)) || ((this.model.showSearch) && !(this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1))) }
+                                    ]">
+                                    <select class="form-select" id="sorting" v-on:change="setSortOrder($event)">
+                                        <option disabled selected>##Sort##</option>
+                                        <template v-for="option in this.model?.sortOptions">
+                                            <template v-if="option=='Title'">
+                                                <option value="+Title">##TitleAsc##</option>
+                                                <option value="-Title">##TitleDesc##</option>
+                                            </template>
+                                            <template v-else-if="option=='Price' && IsPriceSortAllowed">
+                                                <option value="+RetailPrice">##PriceAsc##</option>
+                                                <option value="-RetailPrice">##PriceDesc##</option>
+                                            </template>
+                                            <template v-else-if="option=='SortDate'">
+                                                <option value="+SortDate">##SortDateAsc##</option>
+                                                <option value="-SortDate">##SortDateDesc##</option>
+                                            </template>
+                                        </template>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Page Size -->
+                            <div v-if="this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0" class="filterlist-sorting__pagesize" :class="[
+                                 {'col-4': this.model?.sortOptions !==null && this.model?.sortOptions.length>
+                                0},
+                                {'col-lg-3 ms-auto': !(this.model?.sortOptions !== null && this.model?.sortOptions.length > 0)},
+                                ]">
+                                <div class="col-12 d-flex">
+                                    <select class="form-select" id="pageSize" v-on:change="setPageSize($event)">
+                                        <template v-for="option in this.model?.pageSizeOptions">
+                                            <option :value="option" :selected="this.model?.pageSize == option">{{option}}</option>
+                                        </template>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Views -->
+                    <div v-if="this.model?.previewOptions !== null && this.model?.previewOptions?.length > 1" class="filterlist-views" :class="[
+                         {'col-1 ms-auto': !(this.model.showSearch) && !(this.filterData !=null && (this.model?.sortOptions !==null && this.model?.sortOptions.length>
+                        0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0))},
+                        {'col-3 col-md-1': (this.model.showSearch) && (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0))},
+                        {'col-1': !(this.model.showSearch) && (this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0))},
+                        {'col-1 ms-auto': (this.model.showSearch) && !(this.filterData != null && (this.model?.sortOptions !== null && this.model?.sortOptions.length > 0) || (this.model?.pageSizeOptions != null && this.model?.pageSizeOptions.length > 0))},
+                        ]">
+                        <div class="row">
+                            <template v-for="(option, index) in this.model?.previewOptions">
+                                <div class="col-6" :class="option==this.DisplayModeEnum.List ? 'preview-list' : 'preview-grid'">
+                                    <a v-if="option==this.DisplayModeEnum.List" href="#" v-on:click.prevent="this.changeDisplayMode($event, this.DisplayModeEnum.List)" role="button">
+                                        <span class="s-list medium"></span>
+                                    </a>
+                                    <a v-else href="#" v-on:click.prevent="this.changeDisplayMode($event, this.DisplayModeEnum.Grid)" role="button">
+                                        <span class="s-grid medium"></span>
+                                    </a>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Filters -->
+            <div v-if="ShowClearFilter" class="filterlist-activeFilters">
+                <div class="filterlist-activeFilters__item" v-for="(activeFilter, index) in this.activeFilters" v-bind:key="activeFilter" role="button" @click="removeFilter('filter-'+activeFilter.slug)">
+                    <span>{{activeFilter.name}}</span>
+                </div>
+                <div v-if="ShowClearFilter" class="clear-filters">
+                    <a :href="url">##clear##</a>
+                </div>
+            </div>
+
+            <!-- No Products found -->
+            <div v-if="this.filterData!=null && this.filterData.products.length===0" class="container text-center">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAACuCAIAAABWVBMyAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA5xpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQ1IDc5LjE2MzQ5OSwgMjAxOC8wOC8xMy0xNjo0MDoyMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCNDNGNDRCMTBFQTQxMUVBODBCM0Q4MDExMTYzNDlEMyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCNDNGNDRCMDBFQTQxMUVBODBCM0Q4MDExMTYzNDlEMyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSBNYWNpbnRvc2giPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0iRTYwMTcxRTY4QkI1Njc3RjgwNEE4QkYyODkyRTgwNjgiIHN0UmVmOmRvY3VtZW50SUQ9IkU2MDE3MUU2OEJCNTY3N0Y4MDRBOEJGMjg5MkU4MDY4Ii8+IDxkYzpjcmVhdG9yPiA8cmRmOlNlcT4gPHJkZjpsaT5WZWN0b3JTdG9jay5jb20vMTc2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"
+                     width="72" class="d-block mx-auto mb-4" alt="No products found">
+                <p class="">##NoproductsSelection##</p>
+                <a class="btn btn-primary" v-bind:href="getCurrentLink()">
+                    ##Browseproducts##
+                </a>
+            </div>
+
+            <!-- Loading -->
+            <div v-if="this.filterData===null" class="row" style="height: 500px;">
+                <section class="col-lg-12">
+                    <div class="d-flex flex-wrap justify-content-justify-content-center pt-3" style="height:250px;">
+                        <div class="d-none d-sm-block py-1 fs-sm mx-auto">
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-center justify-content-center pt-4 pb-4 pb-sm-5 mt-1">
+                        <div class="spinner-grow spinner-grow-sm body-secondary-text" style="width: 2rem; height: 2rem;"
+                             role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Products -->
+            <div v-if="this.filterData!==null" class="filterlist-content__wrap row">
+                <!-- Products Grid -->
+                <div v-if="this.displayMode==this.DisplayModeEnum.Grid" class="filterlist-single_product"
+                     :class="filtersPosition == 0 && (this.filterData !== null && this.filterData.filters.length > 0) ? 'col-lg-4 col-md-6 col-sm-6 px-2' : 'col-lg-3 col-md-6 col-sm-6 px-2'"
+                     v-for="(product, index) in this.filterData.products"
+                     v-bind:key="product">
+                    <productlistitemdetail :model="product" :additionalFields="this.model.additionalFields" :isCalculated="areProductsCalculated"></productlistitemdetail>
+                </div>
+                <!-- Products List -->
+                <div v-else-if="this.displayMode==this.DisplayModeEnum.List" class="filterlist-list">
+                    <div v-if="this.filterData.products.length>0 && displayHeaders" class="row d-flex filterlist-table__header">
+                        <div :class="['col-' + this.ListDistances[0]]">##SKU##</div>
+                        <div :class="['col-' + this.ListDistances[1]]">##Title##</div>
+                        <template v-if="this.additionalFields != null && this.additionalFields.length > 0">
+                            <template v-for="field in this.additionalFields">
+                                <div class="col-2" style="word-break: break-all;">{{field.label}}</div>
+                            </template>
+                        </template>
+                        <div :class="['col-' + this.ListDistances[2]]">##Price##</div>
+                        <div :class="['col-' + this.ListDistances[3]]" style="display:flex;justify-content: center;">##Quantity##</div>
+
+                    </div>
+
+                    <div class="row filterlist-single_product" v-for="(product, index) in this.filterData.products" v-bind:key="product" :id="'row-'+product.productVariants[0]?.id" :class="(index%2===1?'bg-secondary':'')">
+                        <div :class="['col-' + this.ListDistances[0]]">
+                            <span v-if="product.productVariants.length>0 && product.productVariants[0].sku!=null" class="product-sku">{{product.productVariants[0].sku}}</span>
+                        </div>
+
+                        <div :class="['col-' + this.ListDistances[1]]">
+                            <span class="product-title">
+                                <a :href="'/product/'+product.alias">{{product.title}}</a>
+                            </span>
+                        </div>
+
+                        <template v-if="this.additionalFields != null && this.additionalFields.length > 0">
+
+                            <template v-for="field in this.additionalFields">
+                                <div class="col-2">
+                                    <template v-if="getFieldValue(product, field.fieldName) && resolveAuthentication(field)">
+                                        <template v-if="isValidUrl(getFieldValue(product, field.fieldName))">
+                                            <div class="product-tag" role="button" @click="handleFieldUrl(product, field.fieldName)">
+                                                <a :href="getFieldValue(product, field.fieldName)" target="_blank">{{getFieldValue(product, field.fieldName)}}</a>
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="product-tag">
+                                                <span>{{getFieldValue(product, field.fieldName)}}</span>
+                                            </div>
+                                        </template>
+                                    </template>
+                                    <template v-else>
+                                        <span>-</span>
+                                    </template>
+                                </div>
+                            </template>
+                        </template>
+
+                        <div :class="['col-' + (this.ListDistances[2]+this.ListDistances[3])]">
+                            <div class="product-cart">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <addtocart :model="product" :quantityActive="true" :isCalculated="areProductsCalculated"></addtocart>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Pagination if Vertical Filters are active -->
+            <nav v-if="filtersPosition == 0 && (this.filterData!==null && this.filterData.products!=null && this.filterData.products.length>0 && ShowPagination)" class="filterlist-pagination" aria-label="Page navigation">
+                <ul v-if="this.filterData.page !== 1" class="pagination prev">
+                    <li class="page-item">
+                        <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(PreviousPage)">##Prev##</a>
+                    </li>
+                </ul>
+                <ul class="pagination">
+                    <li v-if="ShowFirstPage" class="page-item d-none d-sm-block">
+                        <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(1)">1</a>
+                    </li>
+
+                    <li v-if="ShowPreviousPage">
+                        <div class="p-1">...</div>
+                    </li>
+                    <li v-if="ShowPreviousPage" class="page-item d-none d-sm-block">
+                        <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(PreviousPage)">{{PreviousPage}}</a>
+                    </li>
+
+                    <li class="page-item active d-none d-sm-block" aria-current="page">
+                        <span class="page-link">{{CurrentPage}} <span class="visually-hidden">(current)</span></span>
+                    </li>
+
+                    <li v-if="ShowNextPage" class="page-item d-none d-sm-block">
+                        <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(NextPage)">{{NextPage}}</a>
+                    </li>
+                    <li v-if="ShowNextPage">
+                        <div class="p-1">...</div>
+                    </li>
+
+                    <li v-if="ShowLastPage" class="page-item d-none d-sm-block">
+                        <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(LastPage)">{{LastPage}}</a>
+                    </li>
+                </ul>
+                <ul v-if="(this.filterData.page * this.filterData.pageSize) < this.filterData.totalCount" class="pagination next">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next" v-on:click.prevent="this.sendFilterRequest(NextPage)">##Next##</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </section>
+
+        <!-- Pagination if Horizontal Filters are active -->
+        <nav v-if="filtersPosition == 1 && (this.filterData!==null && this.filterData.products!=null && this.filterData.products.length>0 && ShowPagination)" class="filterlist-pagination" aria-label="Page navigation">
+            <ul v-if="this.filterData.page !== 1" class="pagination prev">
+                <li class="page-item">
+                    <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(PreviousPage)">##Prev##</a>
+                </li>
+            </ul>
+            <ul class="pagination">
+                <li v-if="ShowFirstPage" class="page-item d-none d-sm-block">
+                    <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(1)">1</a>
+                </li>
+
+                <li v-if="ShowPreviousPage">
+                    <div class="p-1">...</div>
+                </li>
+                <li v-if="ShowPreviousPage" class="page-item d-none d-sm-block">
+                    <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(PreviousPage)">{{PreviousPage}}</a>
+                </li>
+
+                <li class="page-item active d-none d-sm-block" aria-current="page">
+                    <span class="page-link">{{CurrentPage}} <span class="visually-hidden">(current)</span></span>
+                </li>
+
+                <li v-if="ShowNextPage" class="page-item d-none d-sm-block">
+                    <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(NextPage)">{{NextPage}}</a>
+                </li>
+                <li v-if="ShowNextPage">
+                    <div class="p-1">...</div>
+                </li>
+
+                <li v-if="ShowLastPage" class="page-item d-none d-sm-block">
+                    <a class="page-link" href="#" v-on:click.prevent="this.sendFilterRequest(LastPage)">{{LastPage}}</a>
+                </li>
+            </ul>
+            <ul v-if="(this.filterData.page * this.filterData.pageSize) < this.filterData.totalCount" class="pagination next">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next" v-on:click.prevent="this.sendFilterRequest(NextPage)">##Next##</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</section>

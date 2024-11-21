@@ -1,0 +1,451 @@
+<div :id="'comp-'+this.model.id" class="navbar-wrap" :class="this.model?.cssClass" :class="[
+        {'collapsedMenu': collapsedMenuWithText || collapsedMenu},
+    ]">
+    <div class="navbar navbar-expand-lg p-0 flex-wrap flex-md-nowrap">
+        <div class="container-xl align-items-stretch p-0">
+
+            <!-- Menu -->
+            <div v-if="menuExists" class="menu-wrap" :class="[
+                    {'order-0': menuLeft},
+                    {'order-0 order-lg-1': menuCenter},
+                    {'order-0 order-lg-2': menuRight},
+
+                    {'me-md-auto me-lg-0': menuLeft && collapsedMenuWithText},
+                    {'mx-lg-auto': menuCenter && allElements},
+                    {'me-auto mx-lg-auto': menuCenter && collapsedMenuWithText},
+                    {'me-lg-0': menuRight && collapsedMenuWithText},
+                    {'me-1 pe-2': sticky},
+
+                    {'menuRight': menuRight},
+                    {'collapsed': collapsedMenuWithText || collapsedMenu},
+                    {'sticky': sticky},
+                ]">
+                <div class="align-self-center position-relative collapse-menu" :class="[
+                        {'d-lg-none': fullMenu},
+                        {'d-lg-none': sticky},
+                    ]" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" id="toggleMenuBtn">
+                    <span class="d-none">##ExpandMenu##</span>
+                    <div class="hamburger-lines">
+                        <span class="line line1"></span>
+                        <span class="line line2"></span>
+                        <span class="line line3"></span>
+                    </div>
+                    <span v-if="collapsedMenuWithText" class="help-text " :class="[
+                        {'ps-3 ps-lg-0 collapsedRightHandle': menuRight},
+                        {'ps-3': !menuRight},
+                    ]">{{this.model.helpText}}</span>
+                </div>
+
+                <div class="justify-content-center h-100" id="navbarCollapse" :class="[
+                        {'collapse': !fullMenu}
+                    ]">
+                    <ul v-if="navigations!==null && navigations.length>0" class="navbar-nav gap-4 h-100">
+                        <template v-for="navItem in navigations">
+                            <li v-if="navItem.isMegaMenu" class="nav-item dropdown">
+                                <span v-if="checkIfClickable(navItem.url)" class="nav-link dropdown-toggle p-0" data-bs-toggle="dropdown"></span>
+                                <a :href="navItem.url" @click="navigation(navItem)" :class="{'active' : checkIfCurrentUrl(navItem.url)}">
+                                    <img v-if="navItem.menuIcon !== null && navItem.menuIcon.link !== null" :src="navItem.menuIcon.link" width="24" height="24" :alt="navItem.menuIcon.alt" />
+                                    {{navItem.navigationTitle}}
+                                </a>
+                                <div class="dropdown-menu px-2 pb-4">
+                                    <div v-for="row in calculateRows(navItem)"
+                                         class="d-flex flex-wrap flex-sm-nowrap mb-5">
+                                        <div v-for="(nav,j) in calculateNavigation(navItem,row-1)"
+                                             class="mega-dropdown-column pt-3 pt-sm-4 px-2 px-lg-3">
+                                            <div class="widget widget-links text-center" style="height:200px;">
+                                                <a v-if="nav.image != null && nav.image.link != null"
+                                                   class="d-flex d-block align-items-center justify-content-center  h-100 "
+                                                   :href="nav.url">
+                                                    <img :src="nav.image.link" width="150" :alt="nav.navigationTitle" />
+                                                </a>
+                                                <a v-else
+                                                   class="d-flex d-block align-items-center justify-content-center  h-100 "
+                                                   :href="nav.url">
+                                                    <img :src="this._getNoImageUrl()" width="150"
+                                                         :alt="nav.navigationTitle" />
+                                                </a>
+                                                <a v-if="checkIfClickable(nav.url)" @click="navigation(nav)"
+                                                   class="widget-list-link d-flex d-block align-items-center justify-content-center  "
+                                                   :href="nav.url">
+                                                    <h6 class="fs-base mb-2 fw-bold p">
+                                                        {{nav.navigationTitle}}
+                                                    </h6>
+                                                </a>
+                                                <a v-else class="widget-list-link mb-4" :href="nav.url">
+                                                    <h6 class="fs-base mb-2 fw-bold p">
+                                                        {{nav.navigationTitle}}
+                                                    </h6>
+                                                </a>
+                                                <ul v-if="nav.navigations !== null && nav.navigations.length > 0"
+                                                    class="widget-list">
+                                                    <li v-for="child in nav.navigations" class="widget-list-item mb-1">
+                                                        <a class="widget-list-link"
+                                                           :href="child.url">{{child.navigationTitle}}</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li v-else-if="navItem.navigations !== null && navItem.navigations.length>0"
+                                class="nav-item dropdown" :class="{'active' : checkIfCurrentUrl(navItem.url)}">
+                                <span class="nav-link dropdown-toggle p-0" data-bs-toggle="dropdown" data-bs-auto-close="outside" @click="bodyClassAction($event)"></span>
+                                <a :href="navItem.url" @click="navigation(navItem)" :class="[{'active' : checkIfCurrentUrl(navItem.url)}, {'disable' : !checkIfHasLink(navItem.url)}]">
+                                    <img v-if="navItem.menuIcon !== null && navItem.menuIcon.link !== null" :src="navItem.menuIcon.link" width="24" height="24" :alt="navItem.menuIcon.alt" />
+                                    {{navItem.navigationTitle}}
+                                </a>
+                                <ul v-html="getMenuTree(navItem)" class="dropdown-menu"></ul>
+                            </li>
+                            <li v-else class="nav-item d-flex">
+                                <a class="nav-link p-0" :href="navItem.url" :class="{'active' : checkIfCurrentUrl(navItem.url)}">
+                                    <img v-if="navItem.menuIcon !== null && navItem.menuIcon.link !== null" :src="navItem.menuIcon.link" width="24" height="24" :alt="navItem.menuIcon.alt" />
+                                    {{navItem.navigationTitle}}
+                                </a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <a v-if="logoExists" class="navbar-brand flex-shrink-0 align-self-center" href="/" :class="[
+                    {'order-1 order-lg-0': logoLeft && !collapsedMenuWithText},
+                    {'order-first order-lg-0': logoLeft && collapsedMenuWithText},
+                    {'order-1': logoCenter && !collapsedMenuWithText},
+                    {'order-first order-lg-1': logoCenter && collapsedMenuWithText},
+                    {'order-1 order-lg-2': logoRight && !collapsedMenuWithText},
+                    {'order-first order-lg-2': logoRight && collapsedMenuWithText},
+
+                    {'mx-lg-auto': logoCenter && !sticky},
+                    {'ms-1 me-auto ps-2 ps-lg-0': !collapsedMenuWithText && allElements && !sticky},
+                    {'ms-1 me-auto ps-2 ps-lg-0': !collapsedMenuWithText && !allElements && !sticky},
+                    {'me-lg-0': logoLeft || logoRight},
+                    {'me-lg-0 ms-lg-auto': ((logoRight || logoCenter) && sticky && !menuLeft) || (sticky && menuLeft && logoRight)},
+                ]">
+                <img v-if="!imageError" :src="this._getLogoUrl('--header-bg-color')" class="d-none d-lg-block" :alt="this._company.name" @error="handleLogoError()">
+                <img v-if="!favImageError" :src="this._getFaviconUrl()" class="d-lg-none" :alt="this._company.name" @error="handleFaviconError()">
+                <div v-if="favImageError || imageError" :class="[
+                        {
+                            'd-none d-lg-block': !favImageError,
+                            'd-lg-none': !imageError
+                        }
+                    ]">
+                    <span class="companyName">{{this._getCompanyName(this._company.name)}}</span>
+                </div>
+            </a>
+
+            <!-- Search -->
+            <div v-if="searchExists" class="toggleSearch d-flex d-lg-none align-self-center order-2 order-lg-last ms-auto ">
+                <div class="d-flex align-items-center p-2 bg-secondary btn">
+                    <span @click="toggleSearch()" class="s-search large" style="cursor: pointer"></span>
+                </div>
+            </div>
+            <div v-if="searchExists" class="input-group align-items-center align-content-lg-stretch search-wrap"
+                 :class="[
+                    {'order-3 order-lg-first': searchLeft},
+                    {'order-3 order-lg-1': searchCenter},
+                    {'order-3 order-lg-2': searchRight},
+
+                    {'ms-auto ms-lg-0': !searchCenter && allElements},
+                    {'ms-auto mx-lg-auto': searchCenter && allElements && !sticky},
+                    {'ms-auto ms-lg-auto': searchRight && sticky},
+                    {'ms-auto me-lg-0 ms-lg-auto': ((searchRight || searchCenter) && sticky && !menuLeft) || (sticky && menuLeft && searchRight)},
+
+                ]">
+                <input class="form-control border-theme" type="text" placeholder="##SearchForProducts##" v-on:input="Search"
+                       @keyup.enter="enterClicked()" v-model="SearchText" />
+                <span @click="enterClicked()" class="s-search large" style="cursor: pointer"></span>
+                <div class="dropdown-search w-100 position-absolute bottom-0">
+                    <ul class="dropdown-menu w-100 px-2" data-simplebar="init"
+                        data-simplebar-auto-hide="true">
+                        <li v-for="(product, index) in products" v-bind:key="product">
+                            <div v-if="product!=null && product.productVariants!=null && product.productVariants.length>=0 "
+                                 class="d-flex align-items-center border-bottom border-theme py-2">
+                                <a class="flex-shrink-0" v-bind:href="'/product/'+ product.alias">
+                                    <img v-if="this._getMediaItem(product.mediaItems)!==null"
+                                         :src="this._getMediaItem(product.mediaItems)" width="64" :alt="product.title"
+                                         class="my-auto py-1" @error="this._handleImageError"
+                                         style="max-height: 80px; object-fit: cover" />
+                                    <img v-else :src="this._getNoImageUrl()" :alt="product.title" width="64"
+                                         class="mx-auto" />
+                                </a>
+                                <div class="ps-2">
+                                    <h6 class="widget-product-title m-0 p">
+                                        <a v-bind:href="'/product/'+ product.alias" class="product-title">
+                                            {{product.title}}
+                                        </a>
+                                        <small v-if="product.subTitle != null" class="product-meta">{{product.subTitle}}</small>
+                                        <small v-if="product.productVariants.length>0 && product.productVariants[0].sku!=null"
+                                               class="product-meta ">
+                                            {{product.productVariants[0].sku}}
+                                        </small>
+                                    </h6>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Extra Buttons -->
+            <div class="standard-btns d-flex align-self-center order-2 order-lg-last ms-0 mx-md-1">
+                <!-- Language -->
+                <div class="lang-wrap align-self-center mx-1 dropdown d-block order-3" v-if="company.languages !== null && company.languages.length > 1 && this._resolveModules('lang')">
+                    <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        <img :src="'/images/' + this.ActiveCulture +'.svg'" width="20" height="15"
+                             :alt="this._getCultureName(this.ActiveCulture)" />
+                        <span class="d-none">{{this._getCultureName(this.ActiveCulture)}}</span>
+                    </button>
+                    <div class="dropdown-menu" style="min-width: unset;">
+                        <a v-for="lang in company.languages" class="dropdown-item" :href="'?lang=' + lang">
+                            <img :src="'/images/' + lang +'.svg'" width="20" height="15" alt="this._getCultureName(lang)" />
+                            <span>{{this._getCultureName(lang)}}</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Account -->
+                <div v-if="userisauthenticated" class="navbar-tool d-flex position-relative account-wrap order-4">
+                    <a href="/profile"
+                       class="navbar-tool mx-1 d-flex align-items-center p-2 bg-secondary btn">
+                        <span class="s-user large"><span class="d-none">##UserButton##</span></span>
+                    </a>
+                    <button type="button" class="btn d-flex flex-column justify-content-center p-0 mx-1"
+                            data-bs-toggle="dropdown">
+                        <span><span>##HelloText##, {{this._global.firstName}}</span></span>
+                        <span class="dropdown-toggle"><span>##MyAccount##</span></span>
+                    </button>
+
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a class="dropdown-item" href="/profile">##Profile##</a>
+                        <a class="dropdown-item" href="/profile/orders">##Orders##</a>
+                        <a class="dropdown-item" href="/account/logout">##LogOut##</a>
+                    </div>
+                </div>
+                <div v-else class="account-wrap order-4">
+                    <a class="navbar-tool mx-1 d-flex align-items-center p-2 bg-secondary btn"
+                       href="#signin-modal" data-bs-toggle="modal">
+                        <span class="s-user large"><span class="d-none">##UserButton##</span></span>
+                    </a>
+
+                    <loginmodal></loginmodal>
+                </div>
+
+                <!-- Announcements -->
+                <div class="announcements-wrap dropdown order-5">
+                    <button type="button" class="btn dropdown-toggle p-2 bg-secondary mx-1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="s-notification large"><span>##Announcements##</span></span>
+                    </button>
+                    <div class="dropdown-menu p-0">
+                        <div v-if="this.announcements !== null && this.announcements.length > 0" class="announcements-wrap__inner">
+                            <p class="header border-bottom px-4 py-3 mb-4">##Announcements##</p>
+                            <div>
+                                <a v-for="(announcement,index) in this.announcements" class="single-announcement p-4" :href="'#announcement-modal-' + this.model.id + '-' + index" data-bs-toggle="modal">
+                                    <p class="title text-primary fw-bold mb-2">{{announcement.title}}</p>
+                                    <div class="desc" v-html="announcement.description"></div>
+                                </a>
+                            </div>
+                        </div>
+                        <div v-else class="text-center text-primary p-3">
+                            <div>##NoAnnouncementsFound##</div>
+                        </div>
+                    </div>
+                    <div v-if="this.announcements !== null && this.announcements.length > 0" class="announcement">
+                        <div v-for="(announcement,index) in this.announcements">
+                            <announcementmodal :id="this.model.id + '-' + index" :announcement="announcement"></announcementmodal>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shopping Lists -->
+                <div v-if="this._resolveModules('shoppinglists')" class="lists-wrap dropdown order-5">
+                    <button type="button" class="btn dropdown-toggle p-2 bg-secondary mx-1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" @click="getLists">
+                        <span class="s-wishlist large"><span>##ShoppingLists##</span></span>
+                    </button>
+                    <div class="dropdown-menu p-0">
+                        <div v-if="this.lists !== null && this.lists.length > 0" class="lists-wrap__inner">
+                            <div class="header border-bottom px-4 py-3 mb-4 d-flex align-items-center justify-content-between">
+                                <p class="m-0">##FavoriteLists##</p>
+                                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close" style="width: 1rem;height: 1rem;"></button>
+                            </div>
+                            <div>
+                                <a v-for="(list,index) in this.lists" class="single-list px-4 py-3 d-flex align-items-center justify-content-between" :href="'/profile/shoppingLists/'+list.alias">
+                                    <div>
+                                        <p class="title fw-bold mb-0">{{list.title}}</p>
+                                        <small v-if="list.items!=null" class="d-flex justify-content-start text-primary">
+                                            {{list.items.length}} ##Products##
+                                        </small>
+                                        <small v-else class="fs-xs h6 d-flex justify-content-start text-primary">
+                                            ##NoProduct##
+                                        </small>
+                                    </div>
+                                    <span class="s-arrow-short"></span>
+                                </a>
+                            </div>
+                        </div>
+                        <div v-else class="text-center text-primary p-3">
+                            <div>##NoFavoriteListFound##</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cart -->
+                <div v-if="!isLoading" :key="cartTotal" class="order-last cart-wrap">
+                    <div @click="toggleCart()" id="navcart-icon" role="button"
+                         class="align-self-center p-2 btn bg-secondary position-relative ms-1">
+                        <span class="s-cart large"><span class="d-none">##Cart##</span></span>
+                        <span class="cart-total" :class="cartTotal == 0 ? 'd-none': ''">{{cartTotal}}</span>
+                    </div>
+                    <div class="dropdown-menu dropdown-menu-end" id="navcart" style="right: 0;" :class="[{'stickyCart': cartDisplayMode == 1}]">
+                        <div v-if="cartPriceLoading" class="cart-popup d-flex flex-column align-items-center justify-content-center"
+                             style="height: 316px">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">##Loading##</span>
+                            </div>
+                        </div>
+                        <div v-else class="cart-popup">
+                            <div v-if="cartData !== '' && cartData.cartItems.length > 0"
+                                 class="widget widget-cart pt-2 pb-3">
+                                <div data-simplebar data-simplebar-auto-hide="false" class="items-wrap">
+                                    <div v-for="item in cartData.cartItems" class="widget-cart-item border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <a class="flex-shrink-0 img-wrap" v-bind:href="'/product/' + item.link">
+                                                <img v-if="item.imageLink" v-bind:src="item.imageLink" width="124"
+                                                     :alt="item.productTitle" class="my-auto py-1"
+                                                     @error="this._handleImageError"
+                                                     style="max-height: 111px; object-fit: cover" />
+                                                <img v-else :src="this._getNoImageUrl()" :alt="item.productTitle"
+                                                     width="124" />
+                                            </a>
+                                            <div class="ps-4 product-info">
+                                                <div class="product-info__top">
+                                                    <h6 class="widget-product-title p">
+                                                        <a v-bind:href="'/product/'+ item.link">
+                                                            {{item.productTitle}}
+                                                        </a>
+                                                    </h6>
+                                                    <span v-if="item.sku!=null" class="product-meta">
+                                                        {{item.sku}}
+                                                    </span>
+                                                    <p v-if="item.dim1Value || item.dim2Value" class="variants small">
+                                                        (<span v-if="item.dim1Value">{{item.dim1Value}}</span>
+                                                        <span v-if="item.dim1Value && item.dim2Value"> / </span>
+                                                        <span v-if="item.dim2Value">{{item.dim2Value}}</span>)
+                                                    </p>
+                                                </div>
+                                                <div class="product-info__bottom">
+                                                    <div class="widget-product-meta">
+                                                        <div class="price-wrap">
+                                                            <span class="me-1">{{this._calculateCurrency(item.price)}}</span>
+                                                            <del v-if="hasDiscount(item) && item.initialPrice > 0 && item.initialPrice > item.price "
+                                                                 class="me-1 initPrice">
+                                                                {{this._calculateCurrency(item.initialPrice)}}
+                                                            </del>
+                                                        </div>
+                                                        <div class="unit-wrap">
+                                                            <span class="separator"> / </span>
+                                                            <span v-if="calculateUnitName(item.salesUnitId)">{{calculateUnitName(item.salesUnitId)}}</span>
+                                                            <span v-else class="unit">##Unit##</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="quantity me-3">
+                                                        <div class="input-group ">
+                                                            <input class="form-control"
+                                                                   @change="this.getCartAfterQuantityChange($event.target.value, item)" type="number" v-model="item.selectedQuantity"
+                                                                   :step="item.orderQuantityStep !== null && item.orderQuantityStep >0?item.orderQuantityStep:1"
+                                                                   :min="this._findMinimum(item.minOrderQuantity !== null && item.minOrderQuantity > 0 ? item.minOrderQuantity : 1, item.orderQuantityStep!==null && item.orderQuantityStep>0?item.orderQuantityStep:1)">
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn-close" type="button" aria-label="Remove" v-on:click="getCartAfterRemove(item.productVariantId)">
+                                                        <span class="s-delete large"><span class="d-none">##Delete##</span></span>
+                                                    </button>
+                                                </div>
+                                                <div v-if="this._settings.isProductLineNotesActive" class="product-info__note mt-2">
+                                                    <p class="product-info__note--btn mb-2" @click="toggleNote" role="button">##Comment##</p>
+                                                    <div class="product-info__note--textarea d-none">
+                                                        <textarea v-model="item.notes" @change="updateCart()" rows="3" id="cart_product-comments" placeholder="##Write_comment##" name="product-info__note--textarea"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="cartData.giftLines!=null && cartData.giftLines.length>0">
+                                    ##Gifts##
+                                    <div v-for="gift in cartData.giftLines" class="widget-cart-item border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <a class="flex-shrink-0" v-bind:href="'/' + gift.link">
+                                                <img v-if="gift.imageLink" v-bind:src="gift.imageLink" width="124"
+                                                     @error="this._handleImageError" :alt="gift.productTitle" />
+                                                <img v-else :src="this._getNoImageUrl()" :alt="gift.productTitle"
+                                                     width="124" />
+                                            </a>
+                                            <div class="ps-4 product-info">
+                                                <h6 class="widget-product-title p">
+                                                    <a v-bind:href="'/'+ gift.link">
+                                                        {{gift.quantity}} x
+                                                        {{gift.productTitle}}
+                                                    </a>
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div v-if="cartDisplayMode == 1" class="cart-total-wrap p-3 border-top">
+                                    <div class="total-num">
+                                        <span class="me-2">##TotalAmount##:</span>
+                                        <span class="">{{this._calculateCurrency(TotalAmount)}}</span>
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-between mt-4 btn-wrap">
+                                        <a class="btn btn-outline-primary py-2 px-3 cart" href="/cart">
+                                            ##ExpandCart##<i class="ci-arrow-right ms-1 me-n1"></i>
+                                        </a>
+                                        <a class="btn btn-primary p-3 checkout" href="/checkout">
+                                            <span class="s-checkout large"><span class="d-none">##Checkout##</span></span>
+                                            ##Checkout##
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div v-if="cartDisplayMode == 0" class="d-flex flex-wrap justify-content-between align-items-center py-3 px-2 border-top">
+                                    <div class="total-num">
+                                        <span class="me-2">##TotalAmount##:</span>
+                                        <span class="">{{this._calculateCurrency(TotalAmount)}}</span>
+                                    </div>
+                                    <a class="btn btn-outline-primary py-2 px-3" href="/cart">
+                                        ##ExpandCart##<i class="ci-arrow-right ms-1 me-n1"></i>
+                                    </a>
+                                </div>
+                                <div v-if="cartPriceLoadingProblem">
+                                    <div class="px-2 alert alert-primary d-flex" role="alert">
+                                        <div class="alert-icon">
+                                            <i class="ci-bell"></i>
+                                        </div>
+                                        <div>##CartError##</div>
+                                    </div>
+                                </div>
+                                <a v-if="cartDisplayMode == 0" class="btn btn-primary p-3 checkout mx-2" href="/checkout">
+                                    <span class="s-checkout large"><span class="d-none">##Checkout##</span></span>
+                                    ##Checkout##
+                                </a>
+                            </div>
+                            <div v-else class="widget widget-cart p-4">
+                                <div class="pt-2 text-center">
+                                    <div class="navcart-icon"></div>
+                                    <p class="text-muted font-size-sm mb-0">
+                                        ##NoProductsInTheCart##
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+<section :id="'comp-'+this.model.id" :class="this.model?.cssClass" class="container textwithimage-wrapper">
+    <div class="row align-items-center justify-content-center">
+        <div v-if="this.imgUrl !== null" :class="this.imageClass" class="img-wrap">
+            <img class="w-100" :src="this.imgUrl" :alt="this.imgAlt" />
+        </div>
+        <div v-if="this.hasText" :class="[this.textClass, this.genTextClass]" class="text-wrap">
+            <div v-if="this.model.header !== null && this.model.header !=''" class="title d-flex flex-wrap mb-2" :class="getAlignmentClass(model.alignment)">
+                <h3 class="mb-0">{{ model.header }}</h3>
+            </div>
+            <h5 v-if="this.model.subHeader !== null && this.model.subHeader!==''" class="subtitle mb-3 pb-2">{{model.subHeader}}</h5>
+            <div v-if="this.model.text !== null && this.model.text!==''" v-html="model.text" class="text pb-2"></div>
+            <div v-if="(this.model.buttonText !== null && this.model.buttonText!=='') || (this.model.buttonLink!==null && this.model.buttonLink!=='')" class="mt-3 mt-xl-4 mt-xll-5">
+                <a type="button" :href="this.model.buttonLink" class="btn btn-primary btn-arrow">{{model.buttonText}}</a>
+            </div>
+        </div>
+    </div>
+</section>

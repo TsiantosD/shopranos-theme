@@ -1,0 +1,98 @@
+<!-- Order details-->
+<div v-if="this.activeStep !== 'orderplaced'" >
+
+<h2 class="h6 pt-1 pb-3 mb-3 border-bottom">##Review_your_order##</h2>
+
+<div v-for="(line, index) in checkout.cartItems" v-bind:key="product" class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
+    <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
+        <a class="d-flex justify-content-between mx-auto me-sm-4" href="#"></a>
+        <img onerror="this.src='this._getNoImageUrl()';" v-if="line.imageLink" class="rounded-3  me-3" :src="line.imageLink" :alt="line.productTitle" style="width: 150px; max-height: 200px; object-fit: cover;">
+        <img v-else class="rounded-3 me-3" :src="this._getNoImageUrl()" :alt="line.productTitle" style="width: 150px; max-height: 200px; object-fit: cover;">
+        <div class="pt-2">
+            <span v-if="line.sku!=null" class="d-block text-secondary fs-sm fw-bold pb-1">{{line.sku}}</span>
+            <h3 class="product-title fs-base mb-2"><a :href="'/product/'+ line.link">{{line.productTitle}}</a></h3>
+            <div class="fs-lg body-secondary-text pt-2">
+
+                <span class="body-secondary-text">{{calculateCurrency(line.price)}} </span>
+                <del v-if="hasDiscount(line)" class="fs-sm text-muted">  {{ this._calculateCurrency(line.lineValue+line.discountValue)}}</del>
+            </div>
+
+        </div>
+    </div>
+    <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width: 9rem;">
+
+        <p class="mb-0"><span class="text-muted fs-sm">##Quantity##:</span><span>&nbsp;{{line.quantity}}</span></p>
+        <p>{{calculateUnitName(line.salesUnitId)}} </p>
+        <a class="btn btn-link px-0" @click="ActivateStep3()"></a>
+    </div>
+
+</div>
+<!-- Client details-->
+<div class="bg-secondary rounded-3 px-4 pt-4 pb-2">
+    <div class="row">
+        <div v-if="this.checkout.shippingAddress.address1==null" class="col-sm-12">
+            <div class="col-sm-12">
+                <h4 class="h6">##Billing## </h4>
+                <ul class="list-unstyled fs-sm">
+                    <!-- <li><span class="text-muted">##Client##:&nbsp;</span>{{this.customerData.name}}</li> -->
+                    <li>
+                        <span class="text-muted">##Address##:&nbsp;</span>{{this.checkout.billingAddress.address1 }}, {{this.checkout.billingAddress.city }}, {{this.checkout.billingAddress.postalCode}}, {{this.checkout.billingAddress.country}}
+                    </li>
+                    <!-- <li><span class="text-muted">Phone:&nbsp;</span>+1 (808) 764 554 330</li>-->
+                </ul>
+            </div>
+        </div>
+        <div v-else-if="this.checkout.shippingAddress.address1!=null" class="col-sm-12">
+            <div class="col-sm-6">
+                <h4 class="h6">##Billing_to##:</h4>
+                <ul class="list-unstyled fs-sm">
+                    <!-- <li><span class="text-muted">##Client##:&nbsp;</span>{{this.customerData.name}}</li> -->
+                    <li>
+                        <span class="text-muted">##Address##:&nbsp;</span>{{this.checkout.billingAddress.address1 }}, {{this.checkout.billingAddress.city }}, {{this.checkout.billingAddress.postalCode}}, {{this.checkout.billingAddress.country}}
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-6">
+                <h4 class="h6">##Shipping_to##:</h4>
+                <ul class="list-unstyled fs-sm">
+                    <!-- <li><span class="text-muted">##Client##:&nbsp;</span>{{this.SelectedBranch.name}}</li> -->
+                    <li>
+                        <span class="text-muted">##Address##:&nbsp;</span>{{this.checkout.shippingAddress.address1 }}, {{this.checkout.shippingAddress.city }}, {{this.checkout.shippingAddress.postalCode}}, {{this.checkout.shippingAddress.country}}
+                </ul>
+            </div>
+        </div>
+        <div v-if="selectedCarrier !== null" class="col-sm-12">
+            <div class="col-sm-12">
+                <h4 class="h6">##Carriers##:</h4>
+                <ul class="list-unstyled fs-sm">
+                    <li>
+                        <span class="text-muted">##Name##:&nbsp;</span>{{selectedCarrier.carrier.name}}
+                    </li>
+                    <li>
+                        <span class="text-muted">##TransitTime##:&nbsp;</span>{{selectedCarrier.carrier.transitTime}}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div v-else>
+    <div class="container pb-5 mb-sm-4">
+        <div class="pt-5">
+            <div v-if="isLoading" class="py-5 mt-sm-3 text-center">
+                <div class="spinner-grow my-5" role="status">
+                    <span class="visually-hidden">##Loading##...</span>
+                </div>
+            </div>
+            <div v-else class="card py-3 mt-sm-3">
+                <div class="card-body text-center">
+                    <h2 class="h4 pb-3">##Thank_you_for_your_order##!</h2>
+                    <p class="fs-sm mb-2">##Your_order_has_been_placed_and_will_be_processed_as_soon_as_possible##.</p>
+                    <p class="fs-sm mb-2">##Make_sure_you_make_note_of_your_order_number_which_is## <span class='fw-medium'>{{checkout.orderCode}}</span></p>
+                    <p class="fs-sm">##You_will_be_receiving_an_email_shortly_with_confirmation_of_your_order##. </p><a class="btn btn-primary mt-3 me-3" href="/">##Go_back_shopping##</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

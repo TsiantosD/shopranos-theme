@@ -1,0 +1,327 @@
+<section class="checkout-wrapper" :id="'comp-'+this.model.id" :class="this.model?.cssClass">
+
+    <!-- SignIn/Up - Guest -->
+    <div v-if="!CanCheckout && this.errorCode==null && !dataLoaded && this.activeStep !== 'orderplaced' && (!signInUser && !signUpUser)" class="login-signup checkout-layout container">
+        <div class="cart-wrap row">
+            <a href="/cart" class="btn btn-outline-secondary cart"><span class="s-arrow-long"></span>##ReturnCart##</a>
+        </div>
+
+        <div class="card-wrap row justify-content-center mt-4">
+            <div class="card col-lg-5 text-center d-flex flex-column justify-content-center align-items-center">
+                <span class="s-cart"><span class="d-none">##Cart##</span></span>
+                <h4>##ProceedCheckout##</h4>
+                <div class="btn btn-primary py-2 px-4" @click="toggleUserSignIn">
+                    ##LoginRegister##
+                </div>
+
+                <button type="button" class="btn btn-outline-primary mt-3 py-2 px-4" @click="enableGuest">
+                    ##GuestCheckout##
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SignIn -->
+    <div v-if="signInUser && this.activeStep !== 'orderplaced' && !signUpUser" class="login-signup checkout-layout container">
+        <div class="cart-wrap row">
+            <div @click="toggleUserSignIn" class="btn btn-outline-secondary cart"><span class="s-arrow-long"></span>##Back##</div>
+        </div>
+        <div class="card-wrap row justify-content-center mt-4">
+            <login :signupInternal="true"></login>
+        </div>
+    </div>
+
+    <!-- SignUp -->
+    <div v-if="signUpUser && this.activeStep !== 'orderplaced' && !signInUser" class="login-signup checkout-layout container">
+        <div class="cart-wrap row">
+            <div @click="toggleUserSignUp" class="btn btn-outline-secondary cart">
+                <span class="s-arrow-long"></span>##Back##</a>
+            </div>
+            <div class="card-wrap row justify-content-center mt-4">
+                <register></register>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order -->
+    <div v-if="this.errorCode==null && CanCheckout && this.activeStep !== 'orderplaced' && (!signInUser && !signUpUser)" class="order-wrap container">
+        <!-- Loading -->
+        <div v-if="!dataLoaded" class="row" style="height: 500px;">
+            <section class="col-lg-12">
+                <div class="d-flex flex-wrap justify-content-justify-content-center pt-3" style="height:250px;">
+                    <div class="d-none d-sm-block py-1 fs-sm mx-auto">
+                    </div>
+                </div>
+                <div class="d-flex flex-column align-items-center justify-content-center pt-3 pb-4 pb-sm-5 mt-1">
+                    <div class="spinner-border" style="width: 2rem; height: 2rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- Order -->
+        <div v-else-if="this.checkout!=null && this.checkout.cartItems !==null && this.checkout.cartItems.length > 0" class="row">
+            <!-- Order Details -->
+            <div class="col-lg-8 order-details">
+
+                <!-- Billing -->
+                <div v-if="isBillingEnabled" class="container order-step" id="billing">
+                    <billingretail :model="checkout" @update:checkout="checkout = $event" @loaded="onBillingLoaded" ref="billingComponent" />
+                </div>
+
+                <!-- Shipping -->
+                <div v-if="isShippingEnabled" class="container order-step" id="shipping">
+                    <shipping :model="checkout" @update:checkout="checkout = $event" ref="shippingComponent" :key="componentKey" />
+                </div>
+
+                <!-- Payment -->
+                <div v-if="isPaymentEnabled" class="container order-step" id="payment">
+                    <payment v-if="checkout" :model="checkout" @update:checkout="checkout = $event" ref="paymentComponent" />
+                </div>
+
+                <!-- Review -->
+                <div class="container order-step d-none" id="review">
+                    <reviewretail :buttonLoading="buttonLoading" @update:buttonLoading="buttonLoading = $event" :activeStep="activeStep" @update:activeStep="activeStep = $event" :steps="steps" :model="checkout" @update:checkout="checkout = $event" ref="reviewComponent" :key="componentKey" />
+                </div>
+            </div>
+            <!-- Sidebar-->
+            <aside v-if="this.activeStep !== 'orderplaced'" :class="!this.isBillingEnabled && !this.isShippingEnabled && !this.isPaymentEnabled ? 'col-12' : 'col-lg-4'">
+                <div class="aside-wrap bg-secondary border p-4">
+                    <div v-if="this.checkout!=null && this.checkout.cartItems.length>0">
+                        <!-- Items -->
+                        <div class="widget mb-4">
+                            <h2 class="widget-title h5 fw-bold mb-4">##Order_summary##</h2>
+                            <!-- Cart Items -->
+                            <div class="widget-items">
+                                <div v-for="item in checkout.cartItems" class="px-3 py-2 border-bottom widget-item">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="left">
+                                            <h6 class="widget-product-title fw-bold p">
+                                                <a v-bind:href="'/product/'+ item.link">{{item.productTitle}}</a>
+                                            </h6>
+                                            <span v-if="item.sku!=null" class="d-block">{{item.sku}}</span>
+                                            <span v-if="item.dim1Value !== null && item.dim2Value !== null" class="d-block">
+                                                (<span>{{item.dim1Value}}</span><span> / {{item.dim2Value}}</span>)
+                                            </span>
+                                            <span v-else-if="item.dim1Value !== null" class="d-block">
+                                                (<span>{{item.dim1Value}}</span>)
+                                            </span>
+                                            <span v-else-if="item.dim2Value !== null" class="d-block">
+                                                (<span v-if="item.dim2Value !== null">{{item.dim2Value}}</span>)
+                                            </span>
+                                        </div>
+                                        <div class="right">
+                                            <div class="widget-product-meta">
+                                                <div class="price-wrap">
+                                                    <span class="me-1">{{this._calculateCurrency(item.price)}}</span>
+                                                    <del v-if="hasDiscount(item) " class="initPrice"> {{this._calculateCurrency(item.initialPrice)}} </del>
+                                                </div>
+                                                <div class="unit-wrap">
+                                                    <span>
+                                                        ({{item.quantity}}
+                                                        <span v-if="calculateUnitName(item.salesUnitId)">{{calculateUnitName(item.salesUnitId)}}</span>
+                                                        <span v-else class="unit">##Unit##</span>
+                                                        )
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="this._settings.isProductLineNotesActive" class="item-note mt-2">
+                                        <p class="item-note__btn mb-2" @click="toggleNote" role="button">##Comment##</p>
+                                        <div class="item-note__textarea d-none">
+                                            <textarea v-model="item.notes" @change="updateCart()" rows="3" id="cart_product-comments" placeholder="##Write_comment##" name="item-note__textarea"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Gift Items -->
+                            <div v-if="checkout.giftLines!=null && checkout.giftLines.length>0" class="gift-wrap">
+                                <p class="gift-title">##Gifts##</p>
+                                <div v-for="gift in checkout.giftLines" class="px-3 py-2 border-bottom border-top widget-item">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="left">
+                                            <h6 class="widget-product-title fw-bold p">
+                                                <a v-bind:href="'/product/'+ gift.productAlias">{{gift.productTitle}}</a>
+                                            </h6>
+                                            <span v-if="gift?.sku" class="d-block">{{gift?.sku}}</span>
+                                        </div>
+                                        <div class="right">
+                                            <div class="widget-product-meta">
+                                                <div class="unit-wrap">
+                                                    <span>
+                                                        ({{gift.quantity}}
+                                                        <span v-if="calculateUnitName(gift.salesUnitId)">{{calculateUnitName(gift.salesUnitId)}}</span>
+                                                        <span v-else class="unit">##Unit##</span>
+                                                        )
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Coupons -->
+                        <div v-if="this._settings.isCouponsActive" class="mb-4 coupons">
+                            <h2 class="h5 mb-4">##Coupons##</h2>
+                            <p class="mb-0">##AddCoupon##</p>
+                            <div class="d-flex mb-2">
+                                <input type="text" v-model="couponCode" class="form-control pe-4" id="couponCode" :disabled="isCouponLoading || isCouponRedeemed" />
+                                <button :disabled="isCouponLoading || this.couponCode == ''" @click="(isCouponRedeemed) ? handleCouponUndo() : handleCouponActivation()" class="btn btn-primary d-flex ms-n4">
+                                    <span v-if="isCouponRedeemed" class="d-flex align-items-center">##Undo## <span v-if="isCouponLoading" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span></span>
+                                    <span v-else class="d-flex align-items-center">##Activate## <span v-if="isCouponLoading" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span></span>
+                                </button>
+                            </div>
+                            <small v-if="couponMessage === 0" class="text-danger d-block" class="mb-1">
+                                ##enterCouponCode##
+                            </small>
+                            <small v-else-if="couponMessage === 1" class="text-danger d-block" class="mb-1">
+                                ##errorFetchCoupon##
+                            </small>
+                            <small v-else-if="couponMessage === 2" class="text-danger d-block" class="mb-1">
+                                ##errorRemoveCoupon##
+                            </small>
+                            <small v-else-if="couponMessage === 3" class="text-success d-block" class="mb-1">
+                                ##couponValidMessage##
+                            </small>
+                        </div>
+
+                        <!-- Reward Points -->
+                        <div v-if="this._settings.isRewardPointsActive && this.isPointsRedemptionActive" class="mb-4 points">
+                            <h2 class="h5 mb-4">##RewardPoints##</h2>
+
+                            <div v-if="this.rewardPoints < 0 && this.discountFromPoints < 0" class="spinner-border" style="width: 1rem; height: 1rem;" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div v-else>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="me-2">##TotalPoints##</span>
+                                    <span class="text-end">{{ this.rewardPoints }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="me-2">##DiscountFromPoints##</span>
+                                    <span class="text-end">{{ calculateCurrency(this.discountFromPoints) }}</span>
+                                </div>
+                                <button v-if="this.rewardPoints !== 0" :disabled="isPointsLoading" @click="(isPointsRedeemed) ? handlePointsUndo() : handlePointsActivation()" class="btn btn-primary mt-3 d-flex ms-auto">
+                                    <span v-if="isPointsRedeemed" class="d-flex align-items-center">##Undo##<span v-if="isPointsLoading" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span></span>
+                                    <span v-else class="d-flex align-items-center">##RedeemPoints##<span v-if="isPointsLoading" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Billing Info WrapUp -->
+                        <div v-if="isBillingEnabled || (isShippingEnabled && this._global.isAuthenticated)" class="mb-4 billing-wrap">
+                            <p class="fw-semibold">##Billing##:</p>
+                            <p v-if="checkout.billingAddress !== null && checkout.billingAddress.address1 !== '' && checkout.billingAddress.postalCode !== '' && checkout.billingAddress.city !== '' && checkout.billingAddress.country !== ''" id="order-billing">{{checkout.billingAddress.address1 }}, {{checkout.billingAddress.city }}, {{checkout.billingAddress.postalCode}}, {{checkout.billingAddress.country}}</p>
+                        </div>
+
+                        <!-- Shipping Info WrapUp -->
+                        <div v-if="isBillingEnabled || (isShippingEnabled && this._global.isAuthenticated)" class="mb-4 shipping-wrap">
+                            <p class="fw-semibold">##Shipping##:</p>
+                            <p v-if="checkout.shippingAddress !== null && checkout.shippingAddress.address1 !== '' && checkout.shippingAddress.postalCode !== '' && checkout.shippingAddress.city !== '' && checkout.shippingAddress.country !== ''" id="order-shipping">{{checkout.shippingAddress.address1}}, {{checkout.shippingAddress.city}}, {{checkout.shippingAddress.postalCode}}, {{checkout.shippingAddress.country}}</p>
+                        </div>
+
+                        <!-- Comments -->
+                        <div class="mb-4 comments-wrap">
+                            <label class="form-label" for="order-comments">
+                                <span class="fw-semibold">##Additional_comments##:</span>
+                            </label>
+                            <textarea v-model="checkout.notes" class="form-control" rows="1" id="order-comments" placeholder="##Write_comment##"></textarea>
+                        </div>
+
+                        <!-- Calculate Price -->
+                        <ul class="list-unstyled mb-3 price-wrap">
+                            <li class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="me-2">##SubTotal##</span>
+                                <span class="text-end fw-bold num">{{ this.calculateSubTotal()}}</span>
+                            </li>
+                            <li v-if="discount" class="d-flex justify-content-between align-items-center mt-n2 mb-2">
+                                <span class="me-2">##Discount##</span>
+                                <span class="text-end fw-bold num">{{discount}}</span>
+                            </li>
+                            <li v-if="(this._settings.isCouponsActive && isCouponRedeemed) || isPointsRedeemed" class="d-flex justify-content-between align-items-center mt-n2 mb-2">
+                                <span class="me-2">##CouponPointsDiscount##</span>
+                                <span class="text-end fw-bold num">{{calculateCurrency(totalRedemptionValue)}}</span>
+                            </li>
+
+                            <li class="d-flex justify-content-between align-items-center">
+                                <span class="me-2">##Net##</span>
+                                <span class="text-end fw-bold num">{{ calculateCurrency(TotalNet)}}</span>
+                            </li>
+                            <li v-if="ExpenseAmount != null && ExpenseAmount > 0" class="d-flex justify-content-between align-items-center">
+                                <span class="me-2">##Expenses##</span>
+                                <span class="text-end fw-bold num">{{ calculateCurrency(ExpenseAmount)}}</span>
+                            </li>
+                            <li v-if="checkout?.shippingLine !== null && checkout?.shippingLine !== undefined && checkout?.shippingLine.totalAmount !== null && checkout?.shippingLine.totalAmount !== undefined" class="d-flex justify-content-between align-items-center">
+                                <span class="me-2">##ShippingConfiguration##</span>
+                                <span class="text-end fw-bold num">{{ calculateCurrency(checkout?.shippingLine.totalAmount)}}</span>
+                            </li>
+                            <li v-if="checkout?.payment?.serviceAmount !== null && checkout?.payment?.serviceAmount !== undefined &&  checkout?.payment?.serviceAmount > 0" class="d-flex justify-content-between align-items-center">
+                                <span class="me-2">##PaymentConfiguration##:</span>
+                                <span class="text-end fw-bold num">{{ calculateCurrency(checkout?.payment?.serviceAmount)}}</span>
+                            </li>
+                        </ul>
+                        <div class="final-price d-flex justify-content-between align-items-center">
+                            <span class="me-2">##TotalOrderPrice##:</span>
+                            <span class="text-end fw-bold num">{{ calculateCurrency(TotalAmount)}}</span>
+                        </div>
+
+                        <!-- Place Order Button -->
+                        <a v-if="!buttonLoading" class="btn btn-primary d-block w-100 submit-order" :class="[{'disabled': !enableButtonAction || (this._settings.isCouponsActive && isCouponLoading) || (this._settings.isRewardPointsActive && this.isPointsRedemptionActive && isPointsLoading)}]" type="submit" formnovalidate="formnovalidate" @click="handleClickOrder()">
+                            <span v-else>##Complete_Order##</span>
+                        </a>
+                        <button v-else type="button" class="btn btn-primary d-block w-100 submit-order">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            ##Placing_Order##...
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Error -->
+    <div v-if="this.errorCode!=null && this.activeStep !== 'orderplaced' && (!signInUser && !signUpUser)" class="container checkout-layout error-wrap">
+        <div class="cart-wrap row">
+            <a href="/cart" class="btn btn-outline-secondary cart"><span class="s-arrow-long"></span>##ReturnCart##</a>
+        </div>
+        <div class="card-wrap row justify-content-center" style="height:300px">
+            <div class="card col-lg-5 text-center d-flex flex-column justify-content-center align-items-center">
+                <h5 v-if="this.errorCode==500" class="mb-0">##UnExpectedError##</h5>
+                <h5 v-else-if="this.errorCode==503" class="mb-0">##ServiceUnavailable## ({{this.errorType}})</h5>
+                <h5 v-else-if="this.errorCode==400" class="mb-0">
+                    <span v-if="this.errorType=='QuantityNotAvailableException'">
+                        ##QuantityNotAvailableException## {{this.errorProducts}}
+                        {{this.errorMessage}}
+                    </span>
+                    <span v-else>##BadRequest##</span>
+                </h5>
+                <p v-if="this.errorCode==401" class="mb-0 mt-3">##NotAuthorized##</p>
+                <p v-if="this.errorCode==404" class="mb-0 mt-3">##Noproducts##</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- No products -->
+    <div v-else-if="dataLoaded && checkoutData.orderCode == null && (checkout==null || checkout.cartItems.length==0) && this.activeStep !== 'orderplaced' && (!signInUser && !signUpUser)" class="container checkout-layout">
+        <div class="cart-wrap row">
+            <a href="/" class="btn btn-outline-secondary cart">
+                <span class="s-arrow-long"></span>##Go_back_homepage##
+            </a>
+        </div>
+        <div class="card-wrap row justify-content-center">
+            <div class="card col-lg-5 text-center d-flex flex-column justify-content-center align-items-center">
+                <span class="s-cart"><span class="d-none">##Cart##</span></span>
+                <p class="mb-0">##Noproducts##</p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Order Completed -->
+    <div v-if="this.activeStep === 'orderplaced' && (!signInUser && !signUpUser)" class="order-review">
+        <reviewretail :buttonLoading="buttonLoading" @update:buttonLoading="buttonLoading = $event" :activeStep="activeStep" @update:activeStep="activeStep = $event" :steps="steps" :model="checkout" @update:checkout="checkout = $event" ref="reviewComponent" />
+    </div>
+</section>

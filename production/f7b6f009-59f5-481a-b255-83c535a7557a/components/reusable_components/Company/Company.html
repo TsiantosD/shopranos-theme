@@ -1,0 +1,67 @@
+<div v-if="this.customer !==null" class="row gx-4 gy-3">
+    <div class="col-sm-6">
+        <div class="card border-0 shadow">
+            <div class="card-body text-center">
+                <i class="ci-location h3 mt-2 mb-4 text-primary"></i>
+                <h3 class="h6 mb-2">{{this.customer.name}}</h3>
+                <ul class="list-unstyled fs-sm mb-0">
+                    <li>
+                        <span class="nav-link-style">
+                            {{this.customer?.address?.address1}},
+                            {{this.customer?.address?.city}}, {{this.customer?.address?.state}}
+                            {{this.customer?.address?.postalCode}},
+                            {{this.customer?.address?.country}}
+                        </span>
+                    </li>
+                    <li v-if="this.customer.Email">
+                        <span class="text-muted me-1">##Email##:</span>
+                        <a class="nav-link-style"
+                           href="mailto:{{this.customer.Email}}">{{this.customer.email}}</a>
+                    </li>
+                    <li v-if="this.customer.Phone">
+                        <span class="text-muted me-1">##Phone##:</span>
+                        <span class="nav-link-style">{{this.customer.phone}}</span>
+                    </li>
+                    <li v-if="this.customer.VatType">
+                        <span class="text-muted me-1">##VatType##:</span>
+                        <span class="nav-link-style">{{this.customer.vatType}}</span>
+                    </li>
+                    <li v-if="this.customer.TaxOffice">
+                        <span class="text-muted me-1">##TaxOffice##:</span>
+                        <span class="nav-link-style">{{this.customer.taxOffice}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div v-if="this.customer.branches !== null || this.customer.branches.length > 0"
+         v-for="branch in this.customer.branches" class="col-sm-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="ci-location h3 mt-2 mb-4 text-primary"></i>
+                <h3 class="h6 mb-2">{{branch.name}}</h3>
+                <ul class="list-unstyled fs-sm mb-0">
+                    <li v-if="branch.address">
+                        <span class="nav-link-style">
+                            {{branch.address.address1}}, {{branch.address.city}},
+                            {{branch.address.state}} {{branch.address.postalCode}},
+                            {{branch.address.country}}
+                        </span>
+                    </li>
+                    <li v-if="branch.Phone">
+                        <span class="text-muted me-1">##phone##:</span>
+                        <span class="nav-link-style">{{branch.phone}}</span>
+                    </li>
+                    <li v-if="branch.VatType">
+                        <span class="text-muted me-1">##vatType##:</span>
+                        <span class="nav-link-style">{{branch.vatType}}</span>
+                    </li>
+                    <li v-if="branch.TaxOffice">
+                        <span class="text-muted me-1">##taxOffice##:</span>
+                        <span class="nav-link-style">{{branch.taxOffice}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

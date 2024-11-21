@@ -1,0 +1,60 @@
+<form @submit.prevent="checkForm" class="needs-validation text-start" novalidate="">
+    <div class="mb-3">
+        <label class="form-label" :for="'signUpEmail-'+id">##EmailAddress##</label>
+        <input v-model="signUpEmail" class="form-control" type="email" required :id="'signUpEmail-'+id" :name="'signUpEmail-'+id">
+        <small v-if="signUpEmailError===0" class="text-danger">##InvalidEmailText##</small>
+        <small v-else-if="signUpEmailError===1" class="text-danger">##EmptyEmailText##</small>
+        <small v-else-if="signUpEmailError===2" class="text-danger">##UserAlreadyExists##</small>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" :for="'signUpFirstname-'+id">##FirstName##</label>
+        <input v-model="signUpFirstname" class="form-control" type="text" required :id="'signUpFirstname-'+id" :name="'signUpFirstname-'+id">
+        <small v-if="signUpFirstnameError===0" class="text-danger">##InvalidFirstNameText##</small>
+        <small v-else-if="signUpFirstnameError===1" class="text-danger">##EmptyFirstNameText##</small>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" :for="'signUpLastname-'+id">##LastName##</label>
+        <input v-model="signUpLastname" class="form-control" type="text" required=""
+        :id="'signUpLastname-'+id" :name="'signUpLastname-'+id">
+        <small v-if="signUpLastnameError===0" class="text-danger">##InvalidLastNameText##</small>
+        <small v-else-if="signUpLastnameError===1" class="text-danger">##EmptyLastNameText##</small>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" :for="'signUpPassword-'+id">##Password##</label>
+        <div class="password-toggle w-100">
+            <input v-model="signUpPassword" class="form-control" type="password" required
+            :id="'signUpPassword-'+id" :name="'signUpPassword-'+id">
+            <label class="password-toggle-btn" aria-label="Show/hide password">
+                <input class="password-toggle-check" type="checkbox"
+                    @click="toggleVisibility('signUpPassword-'+id)"><span
+                    class="password-toggle-indicator"></span>
+            </label>
+        </div>
+        <small v-if="signUpPasswordError===0" class="text-danger">##EmptyPasswordText##</small>
+        <small v-else-if="signUpPasswordError===1" class="text-danger">##Passwordistooshort##</small>
+        <small v-else-if="signUpPasswordError===2"
+            class="text-danger">##Missingalphanumericcharactersandnonalphanumeric##</small>
+        <small v-else-if="signUpPasswordError===3" class="text-danger">##PasswordMismatchText##</small>
+        <small v-else-if="signUpPasswordError === 4"
+            class="text-success">##PasswordCorrectText##</small>
+    </div>
+    <div class="input-group mb-3">
+        <label class="form-label" :for="'signUpReTypePassword-'+id">##RetypePassword##</label>
+        <div class="password-toggle w-100">
+            <input v-model="signUpReTypePassword" class="form-control" type="password" required
+                :id="'signUpReTypePassword-'+id" :name="'signUpReTypePassword-'+id">
+            <label class="password-toggle-btn" aria-label="Show/hide password">
+                <input class="password-toggle-check" type="checkbox"
+                    @click="toggleVisibility('signUpReTypePassword-'+id)"><span
+                    class="password-toggle-indicator"></span>
+            </label>
+        </div>
+        <small v-if="signUpReTypePasswordError===3" class="text-danger">##PasswordMismatchText##</small>
+        <small v-else-if="signUpReTypePasswordError === 4"
+            class="text-success">##PasswordCorrectText##</small>
+    </div>
+    <button class="btn btn-primary d-block w-100 mt-4" type="submit">
+        <div v-show="!isloading">##Register##</div>
+        <span v-show="isloading" class="ml-2 spinner-border spinner-border-sm text-white"></span>
+    </button>
+</form>

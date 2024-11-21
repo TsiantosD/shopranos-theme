@@ -1,0 +1,16 @@
+<section :id="'comp-'+this.model.id" v-if="this.documentation !== null" class="product-documentation" :class="this.model?.cssClass">
+    <div v-for="(line, i) in this.documentation.lines" class="product-documentation-single" :class="(i%2==0?'bg-secondary':'reverse')">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="img-wrap" :class="i%2 ? this.rightClass : this.leftClass">
+                    <img v-if="line.mediaItem!=null && line.mediaItem.link !== null" class="w-100" :src="line.mediaItem.link" :alt="line.title" @error="this._handleImageError" />
+                </div>
+                <div class="txt-wrap" :class="this.textClass+(' ')">
+                    <h4 v-if="line.title !== null && line.title !=='(UNDEFINED)'" class="fw-bold mb-3 pb-3">{{line.title}}</h4>
+                    <div v-if="line.description !== null" v-html="line.description">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

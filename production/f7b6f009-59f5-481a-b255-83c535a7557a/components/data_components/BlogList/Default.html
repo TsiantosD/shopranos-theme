@@ -1,0 +1,109 @@
+<section class="container bloglist" :id="'comp-'+this.model.id" :class="this.model?.cssClass">
+    <div v-if="!isLoading">
+        <div v-if="this.categoryTitle!='' || (this.model.header !== null && this.model.header !='')" class="bloglist-header mb-3">
+            <h2 v-if="this.categoryTitle!=''" class="h4 fw-bold mb-0">{{this.categoryTitle}}</h2>
+            <h2 v-else-if="this.model.header !== null && this.model.header !=''" class="h4 fw-bold mb-0 d-flex" :class="getAlignmentClass(model.alignment)">{{ model.header }}</h2>
+        </div>
+        <div v-if="this.categoryList!=null && this.categoryList.length>0" class="bloglist-categories">
+            <ul class="list-unstyled d-flex flex-wrap align-items-center">
+                <template v-for="(category, index) in this.categoryList">
+                    <li class="bg-secondary me-3" :class="this.categoryId == category.id ? 'active' : ''">
+                        <a class="btn btn-secondary fw-bold py-2 px-4" :href="this.categoryId != category.id ? '/blog/posts/'+category.alias : '/blog/posts'">
+                            <span>{{category.title}}</span>
+                        </a>
+                    </li>
+                </template>
+            </ul>
+        </div>
+        <div v-if="isBlogsLoaded" class="bloglist-blogs">
+            <template v-if="this.blogList.length > 0">
+                <article v-for="(blog, index) in this.blogList" class="bloglist-blogs__single" :class="(currentPage === 1 && index === 0) ? 'top-post' : ''">
+                    <div class="bloglist-blogs__single-image">
+                        <a :href="'/blog/post/'+blog.alias">
+                            <img v-if="blog.mediaItem!==null && blog.mediaItem!==undefined" :src="blog.mediaItem.link" :alt="blog.header">
+                            <img v-else class="no-img" src="/images/no_image.png" :alt="blog.header">
+                        </a>
+                    </div>
+                    <div class="bloglist-blogs__single-content">
+                        <div>
+                            <h2 class="h5 bloglist-blogs__single-title">
+                                <a :href="'/blog/post/'+blog.alias">{{blog.title}}</a>
+                            </h2>
+                            <div class="small bloglist-blogs__single-meta">
+                                <div class="bloglist-blogs__single-author d-flex align-items-center pe-2 me-2 border-end">
+                                    <span v-if="this.calculateAuthorData(blog) !== ''" class="bloglist-blogs__single-author-data">
+                                        <div v-if="blog?.authorProfileImage != null  && blog?.authorProfileImage?.link !=null" class="bloglist-blogs__single-author-avatar">
+                                            <img :src="blog?.authorProfileImage?.link" onerror="this.style.display='none';" alt="Author image">
+                                        </div>
+                                        <span class="bloglist-blogs__single-author-name fw-bold">{{calculateAuthorData(blog)}}</span>
+                                    </span>
+                                    <span v-else class="bloglist-blogs__single-author-name fw-bold">{{this._company.name}} ##Team##</span>
+                                </div>
+                                <span class="bloglist-blogs__single-date text-secondary">{{getDate(blog.publishedAt)}}</span>
+                                <span class="bloglist-blogs__single-readTime">
+                                    <span v-if="getTime(blog.content).hours >= 0">{{getTime(blog.content).hours}} ##hours##</span>
+                                    <span v-if="getTime(blog.content).minutes == -2">< 1 ##minutes##</span>
+                                    <span v-else-if="getTime(blog.content).minutes >= 0">{{getTime(blog.content).minutes}} ##minutes##</span> ##read##
+                                </span>
+                            </div>
+                            <div v-if="(blog.summary !== undefined && blog.summary !== null && blog.summary !== '') && index === 0" class="bloglist-blogs__single-excerpt" v-html="getDescription(blog)"></div>
+                        </div>
+                        <a :href="'/blog/post/'+blog.alias" class="bloglist-blogs__single-more text-end">##ReadMore##</a>
+                    </div>
+                </article>
+            </template>
+            <template v-else>
+                <div class="d-flex flex-column text-center text-secondary" style="height: 20vh;">
+                    <div class="fs-sm py-2">##EmptyListMessage##</div>
+                </div>
+            </template>
+        </div>
+        <div v-else class="d-flex flex-column align-items-center justify-content-center py-4">
+            <div class="spinner-grow spinner-grow-sm body-secondary-text" style="width: 2rem; height: 2rem;" role="status">
+                <span class="visually-hidden">##Loading##...</span>
+            </div>
+        </div>
+        <nav v-if="isBlogsLoaded && totalCount > blogPageSize" class="d-flex justify-content-center pt-5" aria-label="Page navigation" style="gap: 1.5rem;">
+            <ul v-if="currentPage !== 1" class="pagination prev">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Prev" v-on:click.prevent="prevPage()">##Prev##</a>
+                </li>
+            </ul>
+            <ul class="pagination">
+                <li v-if="ShowFirstPage" class="page-item d-none d-sm-block">
+                    <a class="page-link" href="#" v-on:click.prevent="pagination(1)">1</a>
+                </li>
+                <li v-if="ShowPreviousPage">
+                    <div class="p-1">...</div>
+                </li>
+                <li v-if="ShowPreviousPage" class="page-item d-none d-sm-block">
+                    <a class="page-link" href="#" v-on:click.prevent="prevPage()">{{PreviousPage}}</a>
+                </li>
+
+                <li class="page-item active d-none d-sm-block" aria-current="page">
+                    <span class="page-link">{{currentPage}} <span class="visually-hidden">(current)</span></span>
+                </li>
+
+                <li v-if="ShowNextPage" class="page-item d-none d-sm-block">
+                    <a class="page-link" href="#" v-on:click.prevent="nextPage()">{{NextPage}}</a>
+                </li>
+                <li v-if="ShowNextPage">
+                    <div class="p-1">...</div>
+                </li>
+                <li v-if="ShowLastPage" class="page-item d-none d-sm-block">
+                    <a class="page-link" href="#" v-on:click.prevent="pagination(LastPage)">{{LastPage}}</a>
+                </li>
+            </ul>
+            <ul v-if="currentPage < pageCount" class="pagination next">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next" v-on:click.prevent="nextPage()">##Next##</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div v-else class="d-flex flex-column align-items-center justify-content-center py-4">
+        <div class="spinner-grow spinner-grow-sm body-secondary-text" style="width: 2rem; height: 2rem;" role="status">
+            <span class="visually-hidden">##Loading##...</span>
+        </div>
+    </div>
+</section>

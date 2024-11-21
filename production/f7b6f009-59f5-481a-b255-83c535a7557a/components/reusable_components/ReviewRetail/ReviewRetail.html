@@ -1,0 +1,112 @@
+<!-- Order details-->
+<div v-if="this.activeStep !== 'orderplaced'">
+
+    <h2 class="h6 pb-3 mb-3 border-bottom">##Review_your_order##</h2>
+
+    <div v-if="checkout && checkout.cartItems" v-for="(line, index) in checkout.cartItems" v-bind:key="product"
+        class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
+        <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
+            <a class="d-flex justify-content-between mx-auto me-sm-4" href="#"></a>
+            <img onerror="this.src='this._getNoImageUrl()';" v-if="line.imageLink" class="rounded-3me-3"
+                :src="line.imageLink" :alt="line.productTitle" style="width:150px; max-height:200px; object-fit:cover;">
+            <img v-else class="rounded-3 me-3" :src="this._getNoImageUrl()" :alt="line.productTitle"
+                style="width:150px; max-height:200px; object-fit:cover;">
+            <div class="pt-2">
+                <span v-if="line.sku!=null" class="d-block text-secondary fs-sm fw-bold pb-1">{{line.sku}}</span>
+                <h3 class="product-title fs-base mb-2">
+                    <a :href="'/product/'+ line.link">{{line.productTitle}}</a>
+                </h3>
+                <p v-if="line.dim1Value" class="mb-2 small">({{line.dim1Value}} /{{line.dim2Value}})</p>
+                <div class="fs-lg body-secondary-text pt-2">
+                    <span class="body-secondary-text">{{calculateCurrency(line.price)}} </span>
+                    <del v-if="hasDiscount(line)"
+                        class="fs-sm text-muted me-2">{{this._calculateCurrency(line.initialPrice)}} </del>
+                </div>
+
+            </div>
+        </div>
+        <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width:9rem;">
+
+            <p class="mb-0"><span class="text-muted fs-sm">##Quantity##:</span><span> {{line.quantity}}</span></p>
+            <p>{{calculateUnitName(line.salesUnitId)}} </p>
+            <a class="btn btn-link px-0" @click="ActivateStep3()"></a>
+        </div>
+
+    </div>
+    <!-- Client details-->
+    <div class="bg-secondary rounded-3 px-4 pt-4 pb-2">
+        <div class="row">
+            <div v-if="this.checkout && this.checkout.shippingAddress && this.checkout.shippingAddress.address1==null"
+                class="col-sm-12">
+                <div class="col-sm-12">
+                    <h4 class="h6">##Billing## </h4>
+                    <ul class="list-unstyled fs-sm">
+                        <li>
+                            <span
+                                class="text-muted">##Address##: </span>{{this.checkout.billingAddress.address1}},{{this.checkout.billingAddress.city}},{{this.checkout.billingAddress.postalCode}},{{this.checkout.billingAddress.country}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div v-else-if="this.checkout && this.checkout.shippingAddress && this.checkout.shippingAddress.address1!=null"
+                class="col-sm-12">
+                <div class="col-sm-6">
+                    <h4 class="h6">##Billing_to##:</h4>
+                    <ul class="list-unstyled fs-sm">
+                        <li>
+                            <span
+                                class="text-muted">##Address##: </span>{{this.checkout.billingAddress.address1}},{{this.checkout.billingAddress.city}},{{this.checkout.billingAddress.postalCode}},{{this.checkout.billingAddress.country}}
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-6">
+                    <h4 class="h6">##Shipping_to##:</h4>
+                    <ul class="list-unstyled fs-sm">
+                        <li>
+                            <span
+                                class="text-muted">##Address##: </span>{{this.checkout.shippingAddress.address1}},{{this.checkout.shippingAddress.city}},{{this.checkout.shippingAddress.postalCode}},{{this.checkout.shippingAddress.country}}
+                    </ul>
+                </div>
+            </div>
+            <div v-if="this.checkout && this.checkout.shippingLine" class="col-sm-12 la">
+                <div class="col-sm-12 sdadc">
+                    <h4 class="h6">##Carriers##:</h4>
+                    <ul class="list-unstyled fs-sm">
+                        <li>
+                            <span
+                                class="text-muted">##Name##: </span>{{getSelectedCarrier(this.checkout.shippingLine).name}}
+                        </li>
+                        <li v-if="getSelectedCarrier(this.checkout.shippingLine).transitTime !== null">
+                            <span
+                                class="text-muted">##TransitTime##: </span>{{getSelectedCarrier(this.checkout.shippingLine).transitTime}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div v-else class="order-review__completed">
+    <div class="container">
+        <div class="card-wrap row justify-content-center">
+            <div v-if="isLoading" class="">
+                <div class="spinner-grow my-5" role="status">
+                    <span class="visually-hidden">##Loading##...</span>
+                </div>
+            </div>
+            <div v-else class="card col-lg-5 text-center d-flex flex-column justify-content-center align-items-center">
+                <div class="cart-icon-wrap">
+                    <span class="s-cart"><span class="d-none">##Cart##</span></span>
+                </div>
+                <h2 class="mb-2 fw-bold">##Thank_you##</h2>
+                <p class="mb-5 text-muted">##for_your_order## <span></span></p>
+                <p v-if="checkout && checkout.orderCode" class="mb-5 order-number">
+                    ##Order_Number##:<span>{{checkout.orderCode}}</span></p>
+                <div class="btn-wrap">
+                    <a href="/" class="btn btn-outline-secondary "><span
+                            class="s-arrow-long"></span>##Go_back_homepage##</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,106 @@
+<template v-if="this._global.isAuthenticated && this._global.permissions.includes('cs_manage_sales_orders')">
+    <div class="row align-items-end justify-content-end mb-2">
+        <div class="col-md-2 d-flex justify-content-end">
+            <div class="btn-group dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle btn-shadow btn-sm"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div v-if="isLoading" class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span v-if="!isLoading">##more##</span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#importexportmodal" @click="()=>content='export'"
+                       class="dropdown-item">##ExportCart##</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#importexportmodal" @click="setContentImport"
+                       class="dropdown-item">##ImportCart##</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade " id="importexportmodal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 v-if="content==='export'" class="modal-title">##ExportCart##</h5>
+                    <h5 v-else-if="content==='import'" class="modal-title">##ImportCart##</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div v-if="content==='export'" class="modal-body p-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="radio-excel" name="radio" value="excel"
+                               v-model="exportOption" @click="()=>exportOption='excel'">
+                        <label class="form-check-label" for="radio-excel">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-filetype-xlsx" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M14 4.5V11h-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM7.86 14.841a1.13 1.13 0 0 0 .401.823c.13.108.29.192.479.252.19.061.411.091.665.091.338 0 .624-.053.858-.158.237-.105.416-.252.54-.44a1.17 1.17 0 0 0 .187-.656c0-.224-.045-.41-.135-.56a1.002 1.002 0 0 0-.375-.357 2.028 2.028 0 0 0-.565-.21l-.621-.144a.97.97 0 0 1-.405-.176.37.37 0 0 1-.143-.299c0-.156.061-.284.184-.384.125-.101.296-.152.513-.152.143 0 .266.023.37.068a.624.624 0 0 1 .245.181.56.56 0 0 1 .12.258h.75a1.093 1.093 0 0 0-.199-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.552.05-.777.15-.224.099-.4.24-.527.421-.127.182-.19.395-.19.639 0 .201.04.376.123.524.082.149.199.27.351.367.153.095.332.167.54.213l.618.144c.207.049.36.113.462.193a.387.387 0 0 1 .153.326.512.512 0 0 1-.085.29.558.558 0 0 1-.255.193c-.111.047-.25.07-.413.07-.117 0-.224-.013-.32-.04a.837.837 0 0 1-.249-.115.578.578 0 0 1-.255-.384h-.764Zm-3.726-2.909h.893l-1.274 2.007 1.254 1.992h-.908l-.85-1.415h-.035l-.853 1.415H1.5l1.24-2.016-1.228-1.983h.931l.832 1.438h.036l.823-1.438Zm1.923 3.325h1.697v.674H5.266v-3.999h.791v3.325m7.636-3.325h.893l-1.274 2.007 1.254 1.992h-.908l-.85-1.415h-.035l-.853 1.415h-.861l1.24-2.016-1.228-1.983h.931l.832 1.438h.036l.823-1.438Z" />
+                            </svg>
+                            Excel
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="radio-csv" name="radio" value="csv"
+                               v-model="exportOption" @click="()=>exportOption='csv'">
+                        <label class="form-check-label" for="radio-csv">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-filetype-csv" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM3.517 14.841a1.13 1.13 0 0 0 .401.823c.13.108.289.192.478.252.19.061.411.091.665.091.338 0 .624-.053.859-.158.236-.105.416-.252.539-.44.125-.189.187-.408.187-.656 0-.224-.045-.41-.134-.56a1.001 1.001 0 0 0-.375-.357 2.027 2.027 0 0 0-.566-.21l-.621-.144a.97.97 0 0 1-.404-.176.37.37 0 0 1-.144-.299c0-.156.062-.284.185-.384.125-.101.296-.152.512-.152.143 0 .266.023.37.068a.624.624 0 0 1 .246.181.56.56 0 0 1 .12.258h.75a1.092 1.092 0 0 0-.2-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.551.05-.776.15-.225.099-.4.24-.527.421-.127.182-.19.395-.19.639 0 .201.04.376.122.524.082.149.2.27.352.367.152.095.332.167.539.213l.618.144c.207.049.361.113.463.193a.387.387 0 0 1 .152.326.505.505 0 0 1-.085.29.559.559 0 0 1-.255.193c-.111.047-.249.07-.413.07-.117 0-.223-.013-.32-.04a.838.838 0 0 1-.248-.115.578.578 0 0 1-.255-.384h-.765ZM.806 13.693c0-.248.034-.46.102-.633a.868.868 0 0 1 .302-.399.814.814 0 0 1 .475-.137c.15 0 .283.032.398.097a.7.7 0 0 1 .272.26.85.85 0 0 1 .12.381h.765v-.072a1.33 1.33 0 0 0-.466-.964 1.441 1.441 0 0 0-.489-.272 1.838 1.838 0 0 0-.606-.097c-.356 0-.66.074-.911.223-.25.148-.44.359-.572.632-.13.274-.196.6-.196.979v.498c0 .379.064.704.193.976.131.271.322.48.572.626.25.145.554.217.914.217.293 0 .554-.055.785-.164.23-.11.414-.26.55-.454a1.27 1.27 0 0 0 .226-.674v-.076h-.764a.799.799 0 0 1-.118.363.7.7 0 0 1-.272.25.874.874 0 0 1-.401.087.845.845 0 0 1-.478-.132.833.833 0 0 1-.299-.392 1.699 1.699 0 0 1-.102-.627v-.495Zm8.239 2.238h-.953l-1.338-3.999h.917l.896 3.138h.038l.888-3.138h.879l-1.327 4Z" />
+                            </svg>
+                            CSV
+                        </label>
+                    </div>
+                </div>
+                <div v-else-if="content==='import'" class="modal-body p-4">
+                    <div class="row align-items-end justify-content-between">
+                        <div class="col-md-12 mb-2">
+                            <div class="text-nowrap text-primary mb-2">
+                                ##Add_file## <small>##Accepted_file_types##</small>
+                            </div>
+                            <label hidden for="upload" class="form-label">File</label>
+                            <input ref="upload" class="form-control" type="file" id="upload" @change="uploadChange">
+                            <div class="invalid-feedback" :class="{ 'd-block': hasError}">
+                                ##Please_provide_a_valid_file##
+                            </div>
+                            <p v-if="cartHasProducts===true" class="invalid-feedback d-block ">
+                                ##You_have_items_in_your_cart##
+                            </p>
+                            <div class="pt-2" v-if="importHasError===true">
+                                <p v-if="items != null" class="fs-sm fw-bold">
+                                    {{items.length}}
+                                    ##products_added_to_cart##.
+                                </p>
+                                <p class="fs-sm">##The_below_products_were_not_found##:</p>
+                                <ol v-if="this.errors.length >0">
+                                    <li v-for="error in errors">{{error.message}}</li>
+                                </ol>
+                            </div>
+                            <div class="" v-if="fatalErrorOccured===true">
+                                <p class="invalid-feedback d-block fw-bold">##fatal_error_message## </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer py-2 px-4 text-end">
+                    <button v-if="content==='import'" type="button" class="btn btn-primary btn-sm"
+                            @click.prevent="uploadCart()">
+                        <div v-if="isLoading" class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span v-if="!isLoading">##ImportCart##</span>
+                    </button>
+                    <button v-if="content==='export'" type="button" class="btn btn-primary btn-sm"
+                            @click.prevent="exportCart(exportOption)">
+                        <div v-if="isLoading" class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span v-if="!isLoading">##ExportCart##</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

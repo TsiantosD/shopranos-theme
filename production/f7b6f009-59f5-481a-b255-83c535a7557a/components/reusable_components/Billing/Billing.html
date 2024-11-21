@@ -1,0 +1,88 @@
+<div class="row mb-4">
+    <div class="col-sm-12">
+        <div class="col-sm-12">
+            <h2 class="h6 pb-3 border-bottom">##Billing## </h2>
+            <ul class="list-unstyled fs-sm">
+                <li><span class="fw-medium">##Client##:&nbsp;</span>{{this.customerData.name}}</li>
+                <li>
+                    <span class="fw-medium">##Address##:&nbsp;</span>{{BillingAddress.address1 }}, {{BillingAddress.city }}, {{BillingAddress.postalCode}}, {{BillingAddress.country}}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<h2 class="h6 pt-1 pb-3 mb-3 border-bottom">##Shipping_address##</h2>
+<form novalidate _lpchecked="1">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="mb-3">
+                <label v-if="this.checkout.addresses?.length===1" class="form-label" for="checkout-branch">##Name##</label>
+                <label v-else class="form-label" for="checkout-branch">##Addresses##</label>
+                <input v-if="this.checkout.addresses?.length===1" class="form-control" type="text" :value="this.checkout.addresses[0]?.name" readonly />
+                <select v-else v-model="SelectedBranch" class="form-select" id="checkout-branch">
+                    <option v-for="item in checkout.addresses" v-bind:key="item" v-bind:value="item">{{item.name}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="mb-3">
+                <label class="form-label" placeholder="##Street_name_and_building_number##" for="checkout-address1">##Address1##</label>
+                <input v-model="B_Address1" :class="ValidationClassB_Address1" id="checkout-address1" required>
+                <p v-if="this.B_Address1Error === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                <p v-else-if="this.B_Address1Error === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="mb-3">
+                <label class="form-label"> ##Address2##</label>
+                <input placeholder="##Second_street_name##" type="text" :class="ValidationClassB_Address2" v-model="B_Address2" id="checkout-address2">
+                <!--<p class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">{{this.B_Address2Error}}</p>-->
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="mb-3">
+                <label class="form-label" for="checkout-city">##Town_City##</label>
+                <input v-model="B_City" :class="ValidationClassB_City" id="checkout-city">
+                <p v-if="this.B_CityError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                <p v-else-if="this.B_CityError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="mb-3">
+                <label class="form-label" for="checkout-state">##State##</label>
+                <input v-model="B_State" :class="ValidationClassB_State" type="text" id="checkout-state">
+                <p v-if="this.B_StateError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                <p v-else-if="this.B_StateError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="mb-3">
+                <label class="form-label" for="checkout-county">##Country##</label>
+                <!-- <select v-model="B_Country" @click="loadCountries()" class="form-select" id="selected-country">
+                    <option v-if="countries === null" selected v-bind:value="B_Country">{{customerData.address.country}}</option>
+                    <option v-if="countries!== null" v-for="item in countries" v-bind:key="item.code" v-bind:value="item.code">{{item.name}}</option>
+                </select> -->
+                <input v-model="B_Country" :class="ValidationClassB_Country" id="checkout-county">
+                <p v-if="this.B_CountryError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                <p v-else-if="this.B_CountryError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="mb-3">
+                <label class="form-label" for="checkout-zip">##Postcode_ZIP##</label>
+                <input v-model="B_ZIP" :class="ValidationClassB_ZIP" type="text" id="checkout-zip">
+                <p v-if="this.B_ZIPError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                <p v-else-if="this.B_ZIPError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+            </div>
+        </div>
+    </div>
+</form>

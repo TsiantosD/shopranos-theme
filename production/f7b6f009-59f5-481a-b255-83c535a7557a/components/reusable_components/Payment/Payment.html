@@ -1,0 +1,14 @@
+<h2 class="h5 fw-bold mb-3 py-3 border-bottom head__title">##Payment##</h2>
+<div v-if="checkout && checkout.paymentMethods !== null && checkout.paymentMethods.providers.length > 0" class="border"
+    id="payment-method">
+    <div v-for="(provider, index) in checkout.paymentMethods.providers" class="single-payment py-4 px-3" :key="index">
+        <input type="radio" :id="provider.provider + ' ' + index" :value="provider.provider + ' ' + index"
+            @change="setPayment(provider)" class="me-2 ignoreInput" name="payment-method"
+            :checked="index === 0 ? true:false" />
+        <label :for="provider.provider + ' ' + index">
+            <span class="fw-bold">{{provider?.name}}</span>
+            <span v-if="provider?.serviceAmount"><span class="fw-bold me-1">:</span>{{this.calculateCurrency(provider?.serviceAmount)}}</span>
+            <span v-if="provider?.message" class="message-wrap" v-html="provider?.message"></span>
+        </label>
+    </div>
+</div>

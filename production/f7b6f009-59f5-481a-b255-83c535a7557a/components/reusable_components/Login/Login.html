@@ -1,0 +1,46 @@
+<form @submit.prevent="checkForm" class="needs-validation" novalidate="">
+    <div class="form-input-wrap mb-3">
+        <label class="form-label" :for="'emailLog-'+id">##EmailAddress##</label>
+        <input class="form-control" v-model="this.emailLog" type="email" :id="'emailLog-'+id" :name="'emailLog-'+id" required />
+        <small v-if="this.emailError == 0" class="invalid-feedback" style="display:block">
+            ##InvalidEmailText##
+        </small>
+        <small v-else-if="this.emailError == 1" class="invalid-feedback" style="display:block">
+            ##EmptyEmailText##
+        </small>
+    </div>
+    <div class="form-input-wrap mb-3">
+        <label class="form-label" :for="'passwordLog-'+id">##Password##</label>
+        <div class="password-toggle">
+            <input class="form-control" type="password" v-model="this.passwordLog" :id="'passwordLog-'+id" :name="'passwordLog-'+id" required />
+            <label class="password-toggle-btn" aria-label="Show/hide password">
+                <input class="password-toggle-check" type="checkbox"
+                    @click="toggleVisibility('passwordLog-'+id)" /><span class="password-toggle-indicator"></span>
+            </label>
+        </div>
+        <small v-if="this.passwordError == 0" class="invalid-feedback" style="display:block">
+            ##EmptyPasswordText##
+        </small>
+    </div>
+    <small v-if="wrongCredentials" class="creds-error">##WrongCredentialsText##</small>
+    <small v-if="this.isLocked" class="creds-error">##userLocked##</small>
+    <div class="mb-3 d-flex flex-wrap justify-content-between">
+        <div class="form-check mb-2"></div>
+        <a class="fs-sm" href="/forgotpassword">
+            <small>##forgotPasswordText##</small>
+        </a>
+    </div>
+    <button class="btn btn-primary d-block w-100 mb-3" type="submit">
+        <div v-show="!isloading">##SignIn##</div>
+        <span v-show="isloading" class="ml-2 spinner-border spinner-border-sm text-white"></span>
+    </button>
+    <div class="d-flex flex-wrap justify-content-center align-items-center no-acc">
+        <small>##noAccountText##</small>
+        <a v-if="!signupInternal" href="/register">
+            <small>##signUpHere##</small>
+        </a>
+        <div v-else role="button" class="signUpButton">
+            <small>##signUpHere##</small>
+        </div>
+    </div>
+</form>

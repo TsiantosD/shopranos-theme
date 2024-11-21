@@ -1,0 +1,18 @@
+<section :id="'comp-'+this.model.id" :class="this.model?.cssClass" class="container blogcategorylist">
+    <div v-if="this.model.header !== null && this.model.header !=''" :class="['d-flex', 'flex-wrap', 'mb-3 pb-3 header-wrap', getAlignmentClass(model.alignment)]">
+        <h2 class="h4 fw-bold mb-0">{{ this.model.header }}</h2>
+    </div>
+    <div v-if="blogCategoryList !=null && blogCategoryList.length > 0" class="row gap-4 gap-md-0">
+        <div v-for="blogCategory in blogCategoryList" class="col-sm-6 col-md-4">
+            <a class="card" :href="'/blog/posts/'+ blogCategory.alias">
+                <div class="category-img">
+                    <img v-if="blogCategory.mediaItem != null && blogCategory.mediaItem.link != ''" :src="blogCategory.mediaItem.link" :alt="blogCategory.title">
+                    <img v-else class="no-img" src="/images/no_image.png" :alt="blogCategory.title">
+                </div>
+                <div class="category-title card-body py-4 text-center">
+                    <h3 class="h4">{{blogCategory.title}}</h3>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>

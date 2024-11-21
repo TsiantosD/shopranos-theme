@@ -1,0 +1,110 @@
+<div class="profileinfo-wrapper d-flex flex-column">
+    <div class="profileinfo-wrapper__top mx-auto text-center mb-5">
+        <span class="s-user large mb-5 mx-auto"><span class="d-none">##UserButton##</span></span>
+        <h2 class="h5">##ManageProfile##</h2>
+        <p class="text-muted mb-0">##ProfileDesc##</p>
+    </div>
+    <div v-if="user !==null" class="profileinfo-wrapper__bottom mx-auto row">
+        <div class="col-sm-6 mb-4">
+            <label class="form-label" for="account-fn">##FirstName##</label>
+            <input class="form-control" type="text" id="account-fn" v-model="user.firstName" disabled="">
+        </div>
+        <div class="col-sm-6 mb-4">
+            <label class="form-label" for="account-ln">##LastName##</label>
+            <input class="form-control" type="text" id="account-ln" v-model="user.lastName" disabled="">
+        </div>
+        <div class="col-sm-12 mb-4">
+            <label class="form-label" for="account-email">##Email##</label>
+            <input class="form-control" type="email" id="account-email" v-model="user.email" disabled="">
+        </div>
+        <div class="col-12">
+            <button v-on:click="toggleModalChangePassword" class="btn btn-outline-primary mt-4 px-5 d-flex mx-auto" type="button">##ChangePassword##</button>
+        </div>
+        <div v-if="this.toastSuccessClass == 'show'" class="d-flex justify-content-center position-absolute col-12">
+            <div class="toast" :class="toastSuccessClass" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-success justify-content-end text-white">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close" v-on:click="clearForm()"><span class="d-none">##Close##</span></button>
+                </div>
+                <div class="toast-body text-center text-success">##SuccessMessage##</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" v-bind:class="{show:showModal}" id="profile-pass">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header p-4 mb-4">
+                <h5 class="modal-title">##ChangePassword##</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close" v-on:click="closeModal()"></button>
+            </div>
+            <div class="modal-body p-4 pt-0">
+                <form class="needs-validation" novalidate @submit.prevent="checkForm">
+                    <div class="mb-4">
+                        <label class="form-label mb-0" for="changeEmail">##EmailAddress##*</label>
+                        <input class="form-control" v-model="changeEmail" type="email" name="changeEmail" id="changeEmail" required>
+                        <small v-if="this.changeEmailError == 0" class="text-danger" style="display:block">
+                            ##InvalidEmailText##
+                        </small>
+                        <small v-else-if="this.changeEmailError == 1" class="text-danger" style="display:block">
+                            ##EmptyEmailText##
+                        </small>
+                        <small v-else-if="this.changeEmailError == 2" class="text-danger" style="display:block">
+                            ##NotUserEmail##
+                        </small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label mb-0" for="oldPassword">##OldPassword##*</label>
+                        <div class="password-toggle w-100">
+                            <input class="form-control" v-model="oldPassword" type="password" name="oldPassword" id="oldPassword" required>
+                            <label class="password-toggle-btn" aria-label="Show/hide password">
+                                <input class="password-toggle-check" type="checkbox" @click="toggleVisibility('oldPassword')">
+                                <span class="password-toggle-indicator"></span>
+                            </label>
+                        </div>
+                        <small v-if="this.oldPasswordError == 0" class="text-danger" style="display:block">
+                            ##EmptyPasswordText##
+                        </small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label mb-0" for="newPassword">##NewPassword##*</label>
+                        <div class="password-toggle w-100">
+                            <input class="form-control" v-model="newPassword" type="password" name="newPassword" id="newPassword" required>
+                            <label class="password-toggle-btn" aria-label="Show/hide password">
+                                <input class="password-toggle-check" type="checkbox" @click="toggleVisibility('newPassword')">
+                                <span class="password-toggle-indicator"></span>
+                            </label>
+                        </div>
+                        <small v-if="newPasswordError===0" class="text-danger">##EmptyPasswordText##</small>
+                        <small v-else-if="newPasswordError===1" class="text-danger">##Passwordistooshort##</small>
+                        <small v-else-if="newPasswordError===2" class="text-danger">##Missingalphanumericcharactersandnonalphanumeric##</small>
+                        <small v-else-if="newPasswordError===3" class="text-danger">##PasswordMismatchText##</small>
+                        <small v-else-if="newPasswordError === 4" class="text-success">##PasswordCorrectText##</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label mb-0" for="reTypeNewPassword">##RetypeNewPassword##*</label>
+                        <div class="password-toggle w-100">
+                            <input v-model="reTypeNewPassword" class="form-control" type="password" required id="reTypeNewPassword">
+                            <label class="password-toggle-btn" aria-label="Show/hide password">
+                                <input class="password-toggle-check" type="checkbox" @click="toggleVisibility('reTypeNewPassword')">
+                                <span class="password-toggle-indicator"></span>
+                            </label>
+                        </div>
+                        <small class="text-danger">{{this.passwordValidateError}}</small>
+                    </div>
+
+                    <p v-if="this.badrequest" class="text-danger mb-4" style="display:block">##InvalidRequest##</p>
+                    <p v-if="this.islocked" class="text-danger mb-4" style="display:block">##userLocked##</p>
+    
+                    <button class="btn btn-primary w-100 mt-5" type="submit">
+                        <span>##ChangePassword##</span>
+                        <span v-show="isLoading" class="mx-2 spinner-border spinner-border-sm text-white"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

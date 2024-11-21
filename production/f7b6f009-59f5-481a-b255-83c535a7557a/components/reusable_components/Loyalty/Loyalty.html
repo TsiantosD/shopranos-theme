@@ -1,0 +1,100 @@
+<div v-if="this._settings.isRewardPointsActive || this._settings.isCouponsActive" class="loyalty-wrapper row">
+    <div class="col-lg-9">
+        <div v-if="this._settings.isRewardPointsActive" class="rewardPoints p-4 border">
+            <h2 class="h6 mb-4 d-flex align-items-center"><span class="s-coin large me-3 text-primary"><span class="d-none">##RewardPoints##</span></span>##PointsAvailable##</h2>
+            <div v-if="isRewardsLoading" class="spinner-border d-flex mx-auto" role="status">
+                <span class="visually-hidden">##Loading##</span>
+            </div>
+            <div v-if="!isRewardsLoading && rewardPoints !== null" class="rewardPoints-wrap ps-4 ms-3">
+                <div v-if="rewardPoints > 0" class="d-flex align-items-center">
+                    <p class="totalPoints h4 mb-0 text-primary">{{ this.rewardPoints }}</p>
+                    <!-- <p v-if="expireSoonPoints !== null" class="expireSoonPoints ms-4 mb-0 d-flex align-items-center fw-bold">
+                        <span class="">{{this.expireSoonPoints}} ##points## </span>
+                        <span class="mx-1 text-muted">##expire##</span>
+                        <span>{{ this.expireSoonDatePoints }}</span>
+                    </p> -->
+                </div>
+                <div v-else>
+                    <p class="text-muted mb-0">##NoRewardPointsFound##</p>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="this._settings.isRewardPointsActive" class="redeemPoints my-4">
+            <h2 class="h6 mb-3 d-flex align-items-center">##RedeemPoints##</h2>
+            <div v-if="this.redeemPoints !== null" class="redeemPoints-cards row">
+                <div v-for="redeemPoint in this.redeemPoints" class="col">
+                    <div class="redeemPoints-card p-3 text-center border">
+                        <div class="redeemPoints-card__top">
+                            <p class="h6 mb-2">{{redeemPoint.points}}</p>
+                            <p class="h6 mb-0 text-muted">##points##</p>
+                        </div>
+                        <div class="redeemPoints-card__bottom mt-3 pt-3 border-top">
+                            <p class="h4">{{redeemPoint.price}}€</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="this._settings.isCouponsActive" class="coupons mt-4">
+            <h2 class="h6 mb-4 d-flex align-items-center">##CouponsAvailable##</h2>
+            <div v-if="isCouponsLoading" class="spinner-border d-flex mx-auto" role="status">
+                <span class="visually-hidden">##Loading##</span>
+            </div>
+            <div v-if="!isCouponsLoading && coupons.length == 0" class="ps-4 ms-3">
+                <p class="text-muted mb-0">##NoCouponsFound##</p>
+            </div>
+            <div v-else-if="!isCouponsLoading && coupons.length > 0" class="coupons-cards row">
+                <div v-for="coupon in coupons" class="col-6 col-md-4 col-xl-3">
+                    <div class="coupons-card p-3 border h-100 d-flex flex-column">
+                        <div class="mb-2">
+                            <p v-if="coupon.name !== null || coupon.name !== ''" class="h6 mb-1">{{ coupon.name }}</p>
+                            <p v-if="coupon.minCartValue !== null || coupon.minCartValue !== ''" class="text-muted mb-0 fw-bold">##Over## {{ coupon.minCartValue }}{{this._getCurrencySymbol()}}</p>
+                        </div>
+                        <div class="py-3 coupon-info">
+                            <ul class="ps-3">
+                                <li v-if="coupon.code !== null || coupon.code !== ''">##Code##: {{ coupon.code }}</li>
+                                <li v-if="coupon.dateTo !== null || coupon.dateTo !== ''">##Expiration##: {{getDate(coupon.dateTo)}}</li>
+                            </ul>
+                        </div>
+                        <div class="tooltip-wrap mt-auto">
+                            <button class="btn btn-outline-primary w-100" :id="'coupon-'+coupon.id" v-on:click="copyCode($event)" v-on:mouseout="hideTooltip($event)">
+                                <span v-if="!copiedTooltip" class="tooltiptext">##CopyToClipboard##</span>
+                                <span v-else="!copiedTooltip" class="tooltiptext">##Copied##: {{coupon.code}}</span>
+                                <span>##CopyCode##</span>
+                                <input type="text" :value="coupon.code" class="hide">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 mt-4 mt-lg-0">
+        <div class="loyalty-info bg-secondary border h-100 d-flex flex-column justify-content-between p-4">
+            <div class="loyalty-info__top">
+                <h6 class="mb-4 fw-bold">##HistoryRedemption##</h6>
+                <div class="loyalty-info__top-box">
+                    <template v-if="historyExist">
+                        <div v-for="redemption in redemptions" class="single-redemption row">
+                            <p class="col-6 small mb-2">{{redemption.date}}</p>
+                            <p class="col-6 small mb-2 text-muted text-end">{{redemption.id}}</p>
+                            <p class="col-6 small mb-2 text-muted fw-bold">{{redemption.price}}</p>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <p class="text-muted text-center m-0">##HistoryRedemptionNotFound##</p>
+                    </template>
+                </div>
+            </div>
+            <div class="loyalty-info__bottom d-flex justify-content-center align-items-center mt-4">
+                <small>
+                    <a v-if="isLinkToInfoValid" :href="linkToInfo" target="_blank" rel="noopener noreferrer" class="text-primary">##Info##</a>
+                    <span v-if="isLinkToInfoValid && isLinkToTermsValid" class="mx-1 text-muted">&</span>
+                    <a v-if="isLinkToTermsValid" :href="linkToTerms" target="_blank" rel="noopener noreferrer" class="text-primary">##Terms##</a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

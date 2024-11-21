@@ -1,0 +1,269 @@
+<section v-if="isLoading" class="container pb-5 mb-2 mb-md-4" :class="this.model?.cssClass">
+    <div class="row">
+        <section class="col-lg-12">
+            <div class="d-flex flex-wrap justify-content-justify-content-center pt-3" style="height: 200px;">
+
+                <div class="d-none d-sm-block py-1 fs-sm mx-auto">
+
+                </div>
+
+            </div>
+            <div class="d-flex flex-column align-items-center justify-content-center pt-3 pb-4 pb-sm-5 mt-1">
+                <div class="spinner-grow spinner-grow-sm body-secondary-text" style="width: 2rem; height: 2rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+<section :id="'comp-'+this.model.id" v-else-if="(cart!=null && cart.cartItems.length > 0) || emptyCartAfterDeletion" class="container cart-wrapper">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Actions -->
+            <div class="actions-wrapper row justify-content-between">
+                <div class="col-4 col-md-5">
+                    <a href="/" class="btn btn-outline-secondary back"><span class="s-arrow-long"></span>##Back##</a>
+                </div>
+                <div class="col-8 col-md-7">
+                    <div class="position-relative search-wrapper">
+                        <input class="form-control border-theme" type="text" placeholder='##Quickly_add_product##' v-on:input="Search" v-on:keyup.enter="(this.products>0)?AddClickedProduct(this.products[0]):AddClickedProduct(null)" v-model="SearchText">
+                        <span @click="(this.products>0)?AddClickedProduct(this.products[0]):AddClickedProduct(null)" class="s-search large" style="cursor: pointer"></span>
+                        <div class="dropdown-search w-100" v-on:input="Search">
+                            <ul class="dropdown-menu w-100 px-2" data-simplebar="init" data-simplebar-auto-hide="true" v-on:input="Search">
+                                <li href="#select-variant-modal" v-for="(product, index) in this.products" v-bind:key="product" class="search-item border-bottom" v-on:input="Search" role="button" @click="AddClickedProduct(product)">
+                                    <div class="d-flex align-items-center">
+                                        <a class="flex-shrink-0 img-wrap">
+                                            <img v-if="product.mediaItems.length > 0 && product.mediaItems[0].mediaType=='Image'" class="search-item__image" v-bind:src="product.mediaItems[0].link" width="64" :alt="product.title" class="my-auto py-1" style=" max-height: 80px; object-fit: cover;">
+                                            <img v-else :src="this._getNoImageUrl()" class="search-item__image" alt="" width="64" class="mx-auto" @error="handleImageError" />
+                                        </a>
+                                        <div class="ps-3 search-item__info">
+                                            <h6 class="search-item__title p">
+                                                <a :href="'/product/'+ product.alias">
+                                                    {{product.title}}
+                                                </a>
+                                            </h6>
+                                            <span v-if="product.productVariants.length>0 && product.productVariants[0].sku!=null" class="search-item__meta">
+                                                {{product.productVariants[0].sku}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Cart Items -->
+            <h2 class="h5 fw-bold mb-3">##MyCart##</h2>
+            <div class="items-wrapper">
+                <div v-for="(line, index) in cart.cartItems" v-bind:key="product" class="cart-item border-top">
+                    <div class="d-flex align-items-center py-3">
+                        <a class="flex-shrink-0 img-wrap" v-bind:href="'/product/'+ line.link">
+                            <img v-if="line.imageLink" class="my-auto py-1" :src="line.imageLink" :alt="line.productTitle" style="width:100px;max-height:100px;object-fit:cover;" @error="handleImageError">
+                            <img v-else class="my-auto py-1" :src="this._getNoImageUrl()" :alt="line.productTitle" style="width:100px;" @error="handleImageError">
+                        </a>
+                        <div class="ps-4 product-info">
+                            <div class="product-info__left">
+                                <h3 class="product-title p"><a v-bind:href="'/product/'+ line.link">{{line.productTitle}}</a></h3>
+                                <span v-if="line.sku!=null" class="product-meta">{{line.sku}}</span>
+                                <p v-if="line.dim1Value || line.dim2Value" class="variants small">
+                                    (<span v-if="line.dim1Value">{{line.dim1Value}}</span>
+                                    <span v-if="line.dim1Value && line.dim2Value"> / </span>
+                                    <span v-if="line.dim2Value">{{line.dim2Value}}</span>)
+                                </p>
+                                <div v-if="this.isLoadingData" class="spinner-grow spinner-grow-sm" role="status" style="width:10px;height:10px">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div v-if="this.isLoadingData" class="spinner-grow spinner-grow-sm mx-2" role="status" style="width:10px;height:10px">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div v-if="this.isLoadingData" class="spinner-grow spinner-grow-sm" role="status" style="width:10px;height:10px">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div v-else class="product-meta">
+                                    <div class="price-wrap">
+                                        <span class="me-1">{{this._calculateCurrency(line.price)}}</span>
+                                        <del v-if="hasDiscount(line) && line.initialPrice > 0 && line.initialPrice > line.price " class="me-1 initPrice">
+                                            {{this._calculateCurrency(line.initialPrice)}}
+                                        </del>
+                                    </div>
+                                    <div class="unit-wrap">
+                                        <span class="separator"> / </span>
+                                        <span v-if="calculateUnitName(line.salesUnitId)">{{calculateUnitName(line.salesUnitId)}}</span>
+                                        <span v-else class="unit">##Unit##</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-info__right">
+                                <div class="quantity me-3">
+                                    <div class="input-group">
+                                        <input class="form-control"
+                                               @change="this.getCartAfterQuantityChange($event.target.value, line)"
+                                               type="number"
+                                               v-model="line.selectedQuantity"
+                                               :step="line.orderQuantityStep !== null &&line.orderQuantityStep >0?line.orderQuantityStep:1"
+                                               :min="this._findMinimum(line.minOrderQuantity !== null && line.minOrderQuantity > 0 ? line.minOrderQuantity : 1, line.orderQuantityStep!==null && line.orderQuantityStep>0?line.orderQuantityStep:1)">
+                                    </div>
+                                </div>
+                                <button class="btn-close" type="button" aria-label="Remove" @click="clearItem(line)">
+                                    <span class="s-delete large text-muted"><span class="d-none">##Remove##</span></span>
+                                </button>
+                            </div>
+                            <div v-if="this._settings.isProductLineNotesActive" class="product-info__note mt-2">
+                                <p class="product-info__note--btn mb-2" @click="toggleNote" role="button">##Comment##</p>
+                                <div class="product-info__note--textarea d-none">
+                                    <textarea v-model="line.notes" @change="updateCart()" rows="3" id="cart_product-comments" placeholder="##Write_comment##" name="product-info__note--textarea"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-if="undoDeletionActive" class="undo-wrapper">
+                <span class="s-check large"><span class="d-none">##Remove##</span></span>
+                <div class="text-wrap">
+                    <span class="text">##Product##</span>
+                    <span class="text-prod">"{{deletedProductName}}"</span>
+                    <span class="text">##hasdeleted##</span>
+                </div>
+                <button @click="addProduct()" class="undo-btn">##Undo##</button>
+            </div>
+        </div>
+        <!-- Sidebar -->
+        <aside class="col-lg-4">
+            <div class="aside-wrap bg-secondary border p-4">
+                <div class="mb-5 pb-5">
+                    <div class="widget mb-4">
+                        <h2 class="widget-title h5 fw-bold mb-4">##Order_summary##</h2>
+                        <!-- Gifts -->
+                        <div v-if="this.cart.giftLines!=null && this.cart.giftLines.length>0 && !this.isLoadingData" class="gift-wrap">
+                            <p class="gift-title">##Gifts##</p>
+                            <div v-for="gift in this.cart.giftLines" class="px-3 py-2 border-bottom border-top widget-item">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <a class="flex-shrink-0" v-bind:href="'/product/' + gift.productAlias">
+                                        <img v-if="gift.imageLink" v-bind:src="gift.imageLink" width="32" alt="{{gift.productTitle}}" style="object-fit: cover; aspect-ratio: 1/1;">
+                                        <img v-else :src="this._getNoImageUrl()" alt="" width="32" @error="handleImageError" style="object-fit: cover; aspect-ratio: 1/1;" />
+                                    </a>
+                                    <div class="left">
+                                        <h6 class="widget-product-title fw-bold p">
+                                            <a v-bind:href="'/product/'+ gift.productAlias">{{gift.productTitle}}</a>
+                                        </h6>
+                                        <span v-if="gift?.sku" class="d-block">{{gift?.sku}}</span>
+                                    </div>
+                                    <div class="right">
+                                        <div class="widget-product-meta">
+                                            <div class="unit-wrap">
+                                                <span>
+                                                    ({{gift.quantity}}
+                                                    <span v-if="calculateUnitName(gift.salesUnitId)">{{calculateUnitName(gift.salesUnitId)}}</span>
+                                                    <span v-else class="unit">##Unit##</span>
+                                                    )
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculate Price -->
+                    <ul class="list-unstyled mb-3 price-wrap">
+                        <li v-if="this.cart.discountValue>0" class="d-flex justify-content-between align-items-center">
+                            <span class="me-2">##SubTotal##</span>
+                            <span v-if="!this.isLoadingData" class="text-end fw-bold num">{{ this.calculateSubTotal(this.cart.cartItems)}}</span>
+                        </li>
+                        <li v-if="this.cart.discountValue>0" class="d-flex justify-content-between align-items-center">
+                            <span class="me-2">##Discount##</span>
+                            <span v-if="!this.isLoadingData" class="text-end fw-bold num">{{this._calculateCurrency(this.cart.discountValue)}}</span>
+                        </li>
+                        <li class="d-flex justify-content-between align-items-center">
+                            <span class="me-2">##Net##</span>
+                            <span v-if="!this.isLoadingData" class="text-end fw-bold num">{{ this._calculateCurrency(this.cart.netAmount)}}</span>
+                        </li>
+                        <li class="d-flex justify-content-between align-items-center">
+                            <span class="me-2">##VAT##</span>
+                            <span v-if="!this.isLoadingData" class="text-end fw-bold num">{{ this._calculateCurrency(this.cart.vatAmount)}}</span>
+                        </li>
+                        <li v-if="this.cart?.expenseAmount>0" class="d-flex justify-content-between align-items-center">
+                            <span class="me-2">##Expenses##:</span>
+                            <span v-if="!this.isLoadingData" class="text-end fw-bold num">{{ this._calculateCurrency(this.cart.expenseAmount)}}</span>
+                        </li>
+                    </ul>
+                    <div class="final-price d-flex justify-content-between align-items-center">
+                        <span class="me-2">##TotalOrderPrice##:</span>
+                        <span v-if="!this.isLoadingData" class="text-end fw-bold num">{{ this._calculateCurrency(this.cart.totalAmount)}}</span>
+                        <span v-else class="spinner-grow spinner-grow-sm" role="status">
+                            <span class="visually-hidden">##Loading##...</span>
+                        </span>
+                    </div>
+                </div>
+                <button class="btn btn-primary d-block w-100" :disabled="controlButton" @click="proceedToCheckout()">##Next##</button>
+            </div>
+
+        </aside>
+    </div>
+</section>
+<section v-else class="container cart-wrapper" :id="'comp-'+this.model.id">
+    <div class="row">
+        <div class="col-12">
+            <div class="actions-wrapper row justify-content-between">
+                <div class="col-4 col-md-5">
+                    <a href="/" class="btn btn-outline-secondary back"><span class="s-arrow-long"></span>##Back##</a>
+                </div>
+                <div class="col-8 col-md-7">
+                    <div class="position-relative search-wrapper">
+                        <input class="form-control border-theme" type="text" placeholder='##Quickly_add_product##' v-on:input="Search" v-on:keyup.enter="(this.products>0)?AddClickedProduct(this.products[0]):AddClickedProduct(null)" v-model="SearchText">
+                        <span @click="(this.products>0)?AddClickedProduct(this.products[0]):AddClickedProduct(null)" class="s-search large" style="cursor: pointer"></span>
+                        <div class="dropdown-search w-100" v-on:input="Search">
+                            <ul class="dropdown-menu w-100 px-2" data-simplebar="init" data-simplebar-auto-hide="true" v-on:input="Search">
+                                <li href="#select-variant-modal" data-bs-toggle="modal" v-for="(product, index) in this.products" v-bind:key="product" class="search-item border-bottom" v-on:input="Search" role="button" @click="AddClickedProduct(product)">
+                                    <div class="d-flex align-items-center">
+                                        <a class="flex-shrink-0 img-wrap">
+                                            <img v-if="product.mediaItems.length > 0 && product.mediaItems[0].mediaType=='Image'" class="search-item__image" v-bind:src="product.mediaItems[0].link" width="64" :alt="product.title" class="my-auto py-1" style=" max-height: 80px; object-fit: cover;">
+                                            <img v-else :src="this._getNoImageUrl()" class="search-item__image" alt="" width="64" class="mx-auto" @error="handleImageError" />
+                                        </a>
+                                        <div class="ps-3 search-item__info">
+                                            <h6 class="search-item__title p">
+                                                <a :href="'/product/'+ product.alias">
+                                                    {{product.title}}
+                                                </a>
+                                            </h6>
+                                            <span v-if="product.productVariants.length>0 && product.productVariants[0].sku!=null" class="search-item__meta">
+                                                {{product.productVariants[0].sku}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row no-items-wrapper justify-content-center">
+                <div class="col-5 card d-flex justify-content-center flex-column align-items-center mt-5">
+                    <span class="s-cart large"><span class="d-none">##Cart##</span></span>
+                    <div class="mt-4">
+                        <p class="mb-0">##NoProductsInTheCart##</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal" id="errorMessageModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">##Error##</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>##OutOfStock##</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">##Close##</button>
+            </div>
+        </div>
+    </div>
+</div>

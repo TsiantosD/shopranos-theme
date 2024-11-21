@@ -1,0 +1,112 @@
+<section :id="'comp-'+this.model.id" :class="this.model?.cssClass" class="container-fluid profile-wrapper">
+    <div class="row">
+        <aside class="col-lg-2 p-3" class="sidebar" :class="{minifySidebar: hideSidebarElements}">
+            <a class="btn btn-light d-flex p-0 border-0 m-3 ms-auto text-secondary expand-sidebar" href="#account-menu" data-bs-toggle="collapse" aria-expanded="false" @click="toggleProfileSidebar">
+                <span class="large" :class="hideSidebarElements ? 's-moveright' : 's-moveleft'"><span class="d-none">##AccountMenu##</span></span>
+            </a>
+            <div v-if="this.user !== null" class="user-info p-3 sidebar-elements">
+                <div class="d-flex justify-content-center flex-column align-items-center text-center w-100 pb-3 border-bottom">
+                    <div class="img-thumbnail rounded-circle position-relative p-0 border-0 d-flex justify-content-center align-items-center mb-2">
+                        <img v-if="customer?.logo != null" class="rounded-circle w-100 d-block" v-bind:src="customer?.logo" alt="customer logo" />
+                        <span v-else class="s-user large"><span class="d-none">##UserButton##</span></span>
+                    </div>
+                    <div class="w-100 pb-3 hideSide">
+                        <h3 class="p mb-0 fw-medium">{{user.firstName}} {{user.lastName}}</h3>
+                        <p class="text-secondary mb-0">{{user.email}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="user-actions p-3 sidebar-elements">
+                <ul class="list-unstyled mb-0">
+                    <li>
+                        <a :class="{active: activeTab === 'orders'}" class="nav-link-style d-flex align-items-center p-3" href="#orders">
+                            <span class="s-orders medium"></span>
+                            <span>##Orders##</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a :class="{active: activeTab === 'shoppingLists'}" class="nav-link-style d-flex align-items-center p-3" href="#shoppingLists">
+                            <span class="s-lists medium"></span>
+                            <span>##ShoppingLists##</span>
+                        </a>
+                    </li>
+                    <li v-if="this._settings.isRewardPointsActive || this._settings.isCouponsActive">
+                        <a :class="{active: activeTab === 'loyalty'}" class="nav-link-style d-flex align-items-center p-3" href="#loyalty">
+                            <span class="s-loyalty medium"></span>
+                            <span>##Loyalty##</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a :class="{active: activeTab === 'view'}" class="nav-link-style d-flex align-items-center p-3" href="#view">
+                            <span class="s-user medium"></span>
+                            <span>##ProfileInfo##</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a :class="{active: activeTab === 'addresses'}" class="nav-link-style d-flex align-items-center p-3" href="#addresses">
+                            <span class="s-addresses medium"></span>
+                            <span>##Addresses##</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+        <div class="content p-0 mx-md-3">
+            <div class="d-none mx-md-3 h-100 d-flex flex-column" id="orders">
+                <h3 class="h5 d-flex align-items-center mb-4">
+                    <span class="s-orders medium me-3 text-primary"></span>
+                    <span>##Orders##</span>
+                </h3>
+                <div class="content-inner p-3 flex-grow-1">
+                    <div class="p-3 h-100">
+                        <orders></orders>
+                    </div>
+                </div>
+            </div>
+            <div class="d-none mx-md-3 h-100 d-flex flex-column" id="shoppingLists">
+                <h3 class="h5 d-flex align-items-center mb-4">
+                    <span class="s-lists medium me-3 text-primary"></span>
+                    <span>##ShoppingLists##</span>
+                </h3>
+                <div class="content-inner p-3 flex-grow-1">
+                    <div class="p-3 h-100">
+                        <shoppinglist></shoppinglist>
+                    </div>
+                </div>
+            </div>
+            <div v-if="this._settings.isRewardPointsActive || this._settings.isCouponsActive" class="d-none mx-md-3 h-100 d-flex flex-column" id="loyalty">
+                <h3 class="h5 d-flex align-items-center mb-4">
+                    <span class="s-loyalty medium me-3 text-primary"></span>
+                    <span>##Loyalty##</span>
+                </h3>
+                <div class="content-inner p-3 flex-grow-1">
+                    <div class="p-3 h-100">
+                        <loyalty></loyalty>
+                    </div>
+                </div>
+            </div>
+            <div class="d-none mx-md-3 h-100 d-flex flex-column" id="view">
+                <h3 class="h5 d-flex align-items-center mb-4">
+                    <span class="s-user medium me-3 text-primary"></span>
+                    <span>##ProfileInfo##</span>
+                </h3>
+                <div class="content-inner p-3 flex-grow-1">
+                    <div class="p-3 h-100">
+                        <profileinfo></profileinfo>
+                    </div>
+                </div>
+            </div>
+            <div class="d-none mx-md-3 h-100 d-flex flex-column" id="addresses">
+                <h3 class="h5 d-flex align-items-center mb-4">
+                    <span class="s-addresses medium me-3 text-primary"></span>
+                    <span>##Addresses##</span>
+                </h3>
+                <div class="content-inner p-3 flex-grow-1">
+                    <div class="p-3 h-100">
+                        <addresses></addresses>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

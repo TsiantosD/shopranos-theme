@@ -1,0 +1,86 @@
+<template v-if="this.quantityActive">
+    <div v-if="product.showPrice" class="product-price">
+        <template v-if="isCalculated">
+            <span v-if="this._hasDiscount(product.productVariants[0])">
+                {{this._calculateCurrency(product.productVariants[0].price, 2)}}
+                <del class="initPrice">
+                    {{this._calculateCurrency(product.productVariants[0].initialPrice, 2)}}
+                </del>
+
+            </span>
+            <span v-else>
+                {{this._calculateCurrency(product.productVariants[0].price, 2)}}
+            </span>
+        </template>
+        <div v-else>
+            <div class="spinner-grow spinner-grow-sm text-primary" role="status" style="width:10px;height:10px">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="spinner-grow spinner-grow-sm text-primary mx-2" role="status" style="width:10px;height:10px">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="spinner-grow spinner-grow-sm text-primary" role="status" style="width:10px;height:10px">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div v-else class="product-price" style="height:24px;"></div>
+    <div v-if="product.productVariants[0].canOrder" class="product-cart-qty em">
+        <div v-if="product.productVariants[0].canOrder" class="product-qty">
+            <input v-if="product.productVariants[0].sellOutOfStock" class="form-control quantity" type="number"
+                v-model="product.productVariants[0].selectedQuantity"
+                :step="product.productVariants[0].orderQuantityStep!==null && product.productVariants[0].orderQuantityStep>0?product.productVariants[0].orderQuantityStep:1"
+                :min="product.productVariants[0].minOrderQuantity!==null && product.productVariants[0].minOrderQuantity>0?product.productVariants[0].minOrderQuantity:product.productVariants[0].orderQuantityStep!==null && product.productVariants[0].orderQuantityStep>0?product.productVariants[0].orderQuantityStep:1"
+                @change="onQuantityChange($event.target.value, product)">
+            <input v-else class="form-control quantity" type="number"
+                v-model="product.productVariants[0].selectedQuantity"
+                :min="product.productVariants[0].minOrderQuantity!==null && product.productVariants[0].minOrderQuantity>0?product.productVariants[0].minOrderQuantity:product.productVariants[0].orderQuantityStep!==null && product.productVariants[0].orderQuantityStep>0?product.productVariants[0].orderQuantityStep:1"
+                :max="product.productVariants[0].quantity"
+                :step="product.productVariants[0].orderQuantityStep!==null && product.productVariants[0].orderQuantityStep>0?product.productVariants[0].orderQuantityStep:1"
+                @change="onQuantityChange($event.target.value, product)">
+        </div>
+        <button class="btn btn-primary cart-icon" type="button" @click="addToCartSmallButton(product, index)">
+            <span v-bind:class="{hidden:isLoading(index)}">
+                <span class="s-cart"><span class="d-none">##AddtoCart##</span></span>
+            </span>
+            <span v-bind:class="{hidden:!isLoading(index)}" class="spinner-border spinner-border-sm" role="status"
+                aria-hidden="true"></span>
+        </button>
+    </div>
+    <div v-else class="product-cart-qty" style="height:38px;"></div>
+</template>
+</template>
+<template v-else>
+    <div v-if="product.showPrice" class="product-price">
+        <template v-if="isCalculated">
+            <span>
+                {{this._calculateCurrency(product.productVariants[0].price, 2)}}
+                <del v-if="product.productVariants[0].initialPrice > 0 && product.productVariants[0].initialPrice > product.productVariants[0].price"
+                    class="initPrice">
+                    {{this._calculateCurrency(product.productVariants[0].initialPrice, 2)}}
+                </del>
+            </span>
+        </template>
+        <div v-else>
+            <div class="spinner-grow spinner-grow-sm text-primary" role="status" style="width:10px;height:10px">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="spinner-grow spinner-grow-sm text-primary mx-2" role="status" style="width:10px;height:10px">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="spinner-grow spinner-grow-sm text-primary" role="status" style="width:10px;height:10px">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div v-else class="product-price" style="height:24px;"></div>
+    <div v-if="product.productVariants[0].canOrder" class="product-cart-qty">
+        <button class="btn btn-secondary cart-icon" v-on:click="addToCartBigButton(product,$event)" :id="'but-' + this.uniqueKey + '-' + product.id" :class="totalProductQuantity > 0 ? 'added' : ''">
+            <span class="add-to-cart">
+                <span class="cart-item-circle d-none">{{this.totalProductQuantity}}</span>
+                <span class="text-wrap"><span class="s-plus small"></span>##AddtoCart##</span>
+            </span>
+        </button>
+    </div>
+    <div v-else class="product-cart-qty" style="height:38px;"></div>
+</template>

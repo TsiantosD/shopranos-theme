@@ -1,0 +1,40 @@
+<h2 class="h6 pb-3 mb-2">##Choose_shipping_method##</h2>
+    <div class="table-responsive">
+        <table class="table table-hover fs-sm border-top">
+            <thead>
+                <tr>
+                    <th class="align-middle"></th>
+                    <th class="align-middle">##Shipping_method##</th>
+                    <th class="align-middle">##Delivery_time##</th>
+                    <th class="align-middle">##Handling_fee##</th>
+                </tr>
+            </thead>
+            <tbody v-if="isCarriersLoading">
+                <tr>
+                    <td class="text-center" colspan="5">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">##Loading##...</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            
+            <tbody v-if="carriers!== null && !isCarriersLoading">
+                <tr v-for="carrier in carriers">
+                    <td>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="radio" :id="carrier.carrier.id" v-model="selectedCarrierId" @change="setCarrier" v-bind:value="carrier.carrier.id" name="shipping-method">
+                            <label class="form-check-label" :for="carrier.carrier.id"></label>
+                        </div>
+                    </td>
+                    <td class="align-middle">
+                        <img width="60" v-if="carrier.carrier.logo?.link != null" :src="carrier.carrier.logo?.link" />
+                        <span v-else class="text-dark fw-medium">{{carrier.shippingLine.title}}</span><br><span class="text-muted"></span>
+                    </td>
+                    <td class="align-middle">{{carrier.carrier.transitTime}}</td>
+                    <td class="align-middle">{{calculateCurrency(carrier.shippingLine.totalAmount)}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    

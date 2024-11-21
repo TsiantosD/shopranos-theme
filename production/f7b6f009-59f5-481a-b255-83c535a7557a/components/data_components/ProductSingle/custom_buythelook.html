@@ -1,0 +1,377 @@
+<section :id="'comp-'+this.model.id" :class="this.model?.cssClass" class="product-single "
+    :data-activeProduct="'prod-'+activeProduct">
+    <div class="container tab-pane fade show active" id="general" role="tabpanel">
+        <div class="row">
+            <div class="col-lg-6">
+                <!-- Product Images -->
+                <div class="product-gallery pe-4">
+                    <div class="swiper main-product-swiper gallery">
+                        <div v-if="imageList != null && imageList.length > 0" class="swiper-wrapper">
+                            <div v-for="image in imageList" class="swiper-slide text-center">
+                                <a :href="image.link" class="gallery-item">
+                                    <img :src="image.link" :alt="image?.alt" />
+                                </a>
+                            </div>
+                        </div>
+                        <div v-else class="swiper-wrapper">
+                            <div class="swiper-slide text-center">
+                                <img :src="this._getNoImageUrl()" alt="no image" class="image-empty" />
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="imageList != null && imageList.length > 1" class="swiper side-product-swiper px-2">
+                        <div class="swiper-wrapper">
+                            <div v-for="sideImage in imageList"
+                                class="swiper-slide swiper-slide-visible swiper-slide-active swiper-slide-thumb-active text-center">
+                                <img :src="sideImage.link" class="" style="height: 100%" />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div v-if="productData.productVariants.length >0" class="col-lg-6">
+                <div class="product-info ps-lg-4 ms-lg-3">
+
+                    <!-- Product Title -->
+                    <h1 class="h3 product-title">
+                        <span
+                            v-if="productData.productVariants[activeProduct].title !== null && productData.productVariants[activeProduct].title !== ''">{{productData.productVariants[activeProduct].title}}</span>
+                        <span v-else>{{productData.title}}</span>
+                    </h1>
+
+                    <!-- Product SKU -->
+                    <p v-if="productData.productVariants[activeProduct].sku !== null && productData.productVariants[activeProduct].sku !== ''"
+                        class="product-sku">
+                        <span>{{productData.productVariants[activeProduct].sku}}</span>
+                    </p>
+
+                    <!-- Product Badges -->
+                    <div v-if="this.productData.additionalFeatures.icoTags.length > 0" class="product-badges"
+                        v-html="this._getBadges(this.productData)"></div>
+
+                    <!-- Product Additional fields -->
+                    <template
+                        v-if="model.additionalFields != null && model.additionalFields.length > 0 && getFieldValue(model.additionalFields[0].fieldName) !== 0">
+                        <div class="product-additional" v-for="field in model.additionalFields">
+                            <template v-if="getFieldValue(field.fieldName) && resolveAuthentication(field)">
+                                <template v-if="isValidUrl(getFieldValue(field.fieldName))">
+                                    <a :href="getFieldValue(field.fieldName)" target="_blank">{{field.label}}</a>
+                                </template>
+                                <template v-else>
+                                    <span class="label">{{field.label}}</span>
+                                    <span v-html="getFieldValue(field.fieldName)"></span>
+                                </template>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- Product Availability -->
+                    <div v-if="productData.productVariants[activeProduct].additionalFeatures!= null && !productData.productVariants[activeProduct].sellOutOfStock"
+                        class="product-availability">
+                        <p class="title">##StockAvailability##</p>
+                        <div class="value">
+                            <img class="me-2"
+                                v-if="productData.productVariants[activeProduct].additionalFeatures.stockAvailability?.image?.link != null"
+                                height="50" width="50"
+                                :src="productData.productVariants[activeProduct].additionalFeatures.stockAvailability.image.link"
+                                :alt="productData.productVariants[activeProduct].additionalFeatures.stockAvailability?.message"
+                                style="width: 30px;height: 30px" />
+                            <div class="text"
+                                :style="'background-color: color-mix(in srgb, '+ productData.productVariants[activeProduct].additionalFeatures.stockAvailability?.color + ' 20%, white); color:'+ productData.productVariants[activeProduct].additionalFeatures.stockAvailability?.color + ';'">
+                                {{productData.productVariants[activeProduct].additionalFeatures.stockAvailability?.message}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Variants -->
+                    <template v-if="checkVariantProduct(false, this.productData)">
+                        <div class="product-variants"></div>
+                    </template>
+
+                    <!-- Product Price/Quantity -->
+                    <div v-if="productData.showPrice || productData.productVariants[activeProduct].canOrder"
+                        class="product-price-qty">
+                        <!-- Product Price -->
+                        <div v-if="productData.showPrice" class="product-price">
+                            <span v-if="productData.productVariants[activeProduct].retail !== null"
+                                class="price">{{calculateCurrency(productData.productVariants[activeProduct].retail.price)}}</span>
+                            <span v-else
+                                class="price">{{calculateCurrency(productData.productVariants[activeProduct].price)}}</span>
+                            <span class="separator"> / </span>
+                            <span v-if="this._hasDiscount(productData.productVariants[activeProduct])"
+                                class="initPrice">
+                                <del>{{calculateCurrency(productData.productVariants[activeProduct].retail.initialPrice)}}</del>
+                            </span>
+                            <span
+                                v-if="productData.productVariants[activeProduct].retail != null && productData.productVariants[activeProduct].retail.unit != null"
+                                class="unit">{{productData.productVariants[activeProduct].retail.unit}}</span>
+                            <span v-else-if="productData.productVariants[activeProduct].unit != null"
+                                class="unit">{{productData.productVariants[activeProduct].unit}}</span>
+                            <span v-else class="unit">##Unit##</span>
+                        </div>
+
+                    </div>
+
+                    <!-- Product Cart/Shopping Lists -->
+                    <div v-if="productData.productVariants[activeProduct].canOrder"
+                        class="d-flex -flex-row product-cart-list">
+                        <!-- Shopping Lists -->
+                        <button v-if="this._resolveModules('shoppinglists')"
+                            class="btn btn-outline-primary d-flex gap-3 align-items-center py-2 px-4 product-list"
+                            @click="handleAddToListModal()" :class="checkStyle()">
+                            <span class="s-heart large"><span class="d-none">##ShoppingLists##</span></span>
+                        </button>
+                        <!-- Product Cart -->
+                        <div v-if="productData.productVariants[activeProduct].canOrder" class="product-cart-qty">
+                            <button class="btn btn-secondary cart-icon" v-on:click="addToCart($event)"
+                                :id="'but-'+productData.productVariants[activeProduct].id" :class="totalProductQuantity > 0 ? 'added' : ''">
+                                <span class="add-to-cart">
+                                    <span class="cart-item-circle d-none">{{this.totalProductQuantity}}</span>
+                                    <span class="text-wrap"><span class="s-plus small"></span>##AddToCart##</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Bundle Product -->
+                    <div v-if="bundleProduct" class="bundle-product mt-4 p-4 bg-secondary">
+                        <h5 class="w-100 mb-3">##BuyTheLook##</h5>
+                        <div class="bundleProduct-single d-flex">
+                            <div class="col-4">
+                                <a :href="bundleProduct.alias" class="pe-4 d-block">
+                                    <img :src="bundleProduct.mediaItems[0]?.link"
+                                        :alt="bundleProduct.mediaItems[0]?.alt" class="w-100" />
+                                </a>
+                            </div>
+                            <div class="col-8 d-flex flex-column">
+                                <h6 class="fw-normal">
+                                    <a :href="bundleProduct.alias" class="pe-4 d-block">
+                                        <small
+                                            v-if="bundleProduct.productVariants[activeBundleProduct].title !== null && bundleProduct.productVariants[activeBundleProduct].title !== ''">{{bundleProduct.productVariants[activeBundleProduct].title}}</small>
+                                        <small v-else>{{bundleProduct.title}}</small>
+                                    </a>
+                                </h6>
+
+                                <p
+                                    v-if="bundleProduct.productVariants[activeBundleProduct].sku !== null && bundleProduct.productVariants[activeBundleProduct].sku !== ''">
+                                    <span>{{bundleProduct.productVariants[activeBundleProduct].sku}}</span>
+                                </p>
+
+                                <template v-if="checkVariantProduct(false, this.bundleProduct)">
+                                    <div class="bundle-product-variants">
+                                        <!-- //TODO - Make it dynamic -->
+                                        <div class="attribute size">
+                                            <p class="variantName">Size</p>
+                                            <div class="variantValues">
+                                                <div class="variantValue">
+                                                    <input type="radio" name="Size"
+                                                        id="b9a79c66-855b-47ae-97fa-cbc0563e0188" checked>
+                                                    <label for="36" class="rounded"><span>36</span></label>
+                                                </div>
+                                                <div class="variantValue">
+                                                    <input type="radio" name="Size"
+                                                        id="84aa00db-98a7-4265-9881-6e1b7ebfcde7">
+                                                    <label for="37" class="rounded"><span>37</span></label>
+                                                </div>
+                                                <div class="variantValue">
+                                                    <input type="radio" name="Size"
+                                                        id="5bb948ad-6035-4c27-b70f-9f577698cbc6">
+                                                    <label for="38" class="rounded"><span>38</span></label>
+                                                </div>
+                                                <div class="variantValue">
+                                                    <input type="radio" name="Size"
+                                                        id="c9036598-840f-436b-9835-e525bf945949">
+                                                    <label for="39" class="rounded"><span>39</span></label>
+                                                </div>
+                                                <div class="variantValue">
+                                                    <input type="radio" name="Size"
+                                                        id="13577b71-1199-46cf-8945-228b43088c96">
+                                                    <label for="40" class="rounded"><span>40</span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <div v-if="bundleProduct.showPrice || bundleProduct.productVariants[activeBundleProduct].canOrder"
+                                    class="product-price-qty">
+                                    <div v-if="bundleProduct.showPrice" class="product-price my-n3">
+                                        <span v-if="bundleProduct.productVariants[activeBundleProduct].retail !== null"
+                                            class="price">{{calculateCurrency(bundleProduct.productVariants[activeBundleProduct].retail.price)}}</span>
+                                        <span v-else
+                                            class="price">{{calculateCurrency(bundleProduct.productVariants[activeBundleProduct].price)}}</span>
+                                        <span class="separator"> / </span>
+                                        <span
+                                            v-if="this._hasDiscount(bundleProduct.productVariants[activeBundleProduct])"
+                                            class="initPrice">
+                                            <del>{{calculateCurrency(bundleProduct.productVariants[activeBundleProduct].retail.initialPrice)}}</del>
+                                        </span>
+                                        <span
+                                            v-if="bundleProduct.productVariants[activeBundleProduct].retail != null && bundleProduct.productVariants[activeBundleProduct].retail.unit != null"
+                                            class="unit">{{bundleProduct.productVariants[activeBundleProduct].retail.unit}}</span>
+                                        <span
+                                            v-else-if="bundleProduct.productVariants[activeBundleProduct].unit != null"
+                                            class="unit">{{bundleProduct.productVariants[activeBundleProduct].unit}}</span>
+                                        <span v-else class="unit">##Unit##</span>
+                                    </div>
+                                </div>
+
+                                <div v-if="bundleProduct.productVariants[activeBundleProduct].canOrder"
+                                    class="d-flex -flex-row product-cart-list mt-auto justify-content-end">
+                                    <div v-if="bundleProduct.productVariants[activeBundleProduct].canOrder"
+                                        class="product-cart-qty">
+                                        <button class="btn btn-dark cart-icon" v-on:click="addAllToCart($event)"
+                                            :id="'but-'+bundleProduct.productVariants[activeBundleProduct].id" :class="totalBundleProductQuantity > 0 ? 'added' : ''">
+                                            <span class="add-to-cart">
+                                                <span
+                                                    class="cart-item-circle d-none">{{this.totalBundleProductQuantity}}</span>
+                                                <span class="text-wrap"><span
+                                                        class="s-plus small"></span>##AddAllToCart##</span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Description -->
+    <div v-if="productData.description!=null && productData.description!='' " class="container product-desc">
+        <h2 class="product-desc__title mb-4">##Description##</h2>
+        <div class="product-desc__text" v-html="productData.description"></div>
+    </div>
+    </div>
+
+    <div v-if="masterRelatedProducts.length > 0" class="master-related">
+        <table>
+            <template v-for="masterproduct in masterRelatedProducts">
+                <tr v-if="masterproduct.productVariants[0].canOrder" class="single-related">
+                    <table class="container-sm table-responsive">
+                        <tr>
+                            <td class="single-related__image">
+                                <img v-if="this._getMediaItem(masterproduct.mediaItems)!==null"
+                                    :src="this._getMediaItem(masterproduct.mediaItems)" :alt="masterproduct?.title"
+                                    @error="this._handleImageError">
+                                <img v-else-if="this._getMediaItem(imageList) != null"
+                                    :src="this._getMediaItem(imageList)" />
+                                <img v-else :src="this._getNoImageUrl()" alt="no image" />
+                            </td>
+                            <td class="single-related__sku">
+                                <span class="single-related__headTitle">##SKU##</span>
+                                <span
+                                    class="single-related__headContent">{{masterproduct.productVariants[0].sku}}</span>
+                            </td>
+                            <td class="single-related__title">
+                                <span class="single-related__headTitle">##Title##</span>
+                                <span class="single-related__headContent">
+                                    <a :href="'/product/'+masterproduct?.alias">{{masterproduct.title}}</a>
+                                </span>
+                            </td>
+                            <td class="single-related__price">
+                                <span class="single-related__headTitle">##Price##</span>
+                                <span class="single-related__headContent">
+                                    <span>{{calculateCurrency(masterproduct.productVariants[0].price)}}</span>
+                                    <del v-if="this._hasDiscount(productData.productVariants[0])" class="initPrice">
+                                        {{calculateCurrency(masterproduct.productVariants[0].initialPrice)}}
+                                    </del>
+                                    <span v-if="masterproduct.productVariants[0].unit != null" class="unit"> /
+                                        {{masterproduct.productVariants[0].unit}}</span>
+                                    <span v-else class="unit"> / ##Unit##</span>
+                                </span>
+                            </td>
+                            <td class="single-related__quantity">
+                                <input v-if="masterproduct.productVariants[0].sellOutOfStock"
+                                    class="form-control quantity mx-2" type="number"
+                                    v-model="masterproduct.productVariants[0].selectedQuantity"
+                                    :step="masterproduct.productVariants[0].orderQuantityStep!==null && masterproduct.productVariants[0].orderQuantityStep>0?masterproduct.productVariants[0].orderQuantityStep:1"
+                                    :min="this._findMinimum(masterproduct.productVariants[0].minOrderQuantity,masterproduct.productVariants[0].orderQuantityStep)"
+                                    @change="onMasterQuantityChange($event.target.value, masterproduct)">
+                                <input v-else class="form-control quantity" type="number"
+                                    v-model="masterproduct.productVariants[0].selectedQuantity"
+                                    :step="masterproduct.productVariants[0].orderQuantityStep!==null && masterproduct.productVariants[0].orderQuantityStep>0?masterproduct.productVariants[0].orderQuantityStep:1"
+                                    :min="this._findMinimum(masterproduct.productVariants[0].minOrderQuantity,masterproduct.productVariants[0].orderQuantityStep)"
+                                    :max="masterproduct.productVariants[0].quantity"
+                                    @change="onMasterQuantityChange($event.target.value, masterproduct)">
+                            </td>
+                            <td class="single-related__cart">
+                                <button class="btn btn-primary" type="button" @click="addToCartMultiple(masterproduct)">
+                                    <span :id="'cart-'+masterproduct.productVariants[0].id">
+                                        <span class="s-cart"><span class="d-none">##Cart##</span></span>
+                                    </span>
+                                    <span :id="'spinner-'+masterproduct.productVariants[0].id"
+                                        class="hidden spinner-border spinner-border-sm" role="status"
+                                        aria-hidden="true"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </tr>
+            </template>
+        </table>
+    </div>
+</section>
+
+<div ref="addToList" class="shoppingList-modal modal fade" v-bind:class="{show: showAddToListModal}">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title p">##AddToList##</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"
+                    @click="closeAddToListModal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card product-card">
+                    <div v-if="imageList != null && imageList.length > 0" class="card-img-top mb-3">
+                        <img style="max-height: 350px" :src="imageList[0].link" :alt="imageList[0]?.alt"
+                            @error="this._handleImageError" />
+                    </div>
+                    <div v-else class="card-img-top mb-3">
+                        <img :src="this._getNoImageUrl()" alt="no image" style="max-height: 350px" />
+                    </div>
+                    <div class="card-body p-0">
+                        <h5 v-if="productData.productVariants.length >0" class="product-title mb-5">
+                            {{productData.title}}
+                        </h5>
+                        <div class="col-12 mb-4 shoppingList-wrap" v-if="this.lists.length > 0">
+                            <div data-simplebar data-simplebar-auto-hide="false" style="max-height:190px;">
+                                <div class="form-check" @click="this.updateShoppingList(list);"
+                                    v-for="list in this.lists" :key="list.id">
+                                    <input v-model="list.checked" class="form-check-input" type="checkbox"
+                                        :id="list.alias">
+                                    <label class="fs-md fw-bold tooltip-custom" for="list.alias">
+                                        {{list.title}}
+                                        <small :id="list.id+'-tooltip-text-added'"
+                                            class="d-none ms-2 text-primary">##Added##</small>
+                                        <small :id="list.id+'-tooltip-text-removed'"
+                                            class="d-none ms-2 text-primary">##Removed##</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <form @submit.prevent="createList" class="new-shoppingList-form row g-3">
+                            <div class="col-sm-6">
+                                <input type="text" v-model="this.title" class="form-control py-3" name="name"
+                                    placeholder="##NewListName##" required />
+                            </div>
+                            <div class="col-sm-6">
+                                <button type="submit" class="btn btn-primary w-100 py-3">
+                                    <span class="s-save"><span class="d-none">##Save##</span></span>
+                                    ##Save##
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

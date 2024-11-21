@@ -1,0 +1,104 @@
+<div class="row mx-n2 pt-2">
+    <template v-if="this.transactions != null && !isLoading">
+        <div class="col-md-4 col-sm-6 px-2 mb-4">
+            <div class="bg-secondary h-100 rounded-3 p-4 text-center">
+                <h3 class="fs-sm text-muted">##Debit##</h3>
+                <p class="h2 mb-2 text-danger">{{calculateCurrency(transactions.total?.debit)}}</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 px-2 mb-4">
+            <div class="bg-secondary h-100 rounded-3 p-4 text-center">
+                <h3 class="fs-sm text-muted">##Credit##</h3>
+                <p class="h2 mb-2 text-success">{{calculateCurrency(transactions.total?.credit)}}</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12 px-2 mb-4">
+            <div class="bg-secondary h-100 rounded-3 p-4 text-center">
+                <h3 class="fs-sm text-muted">##Balance##</h3>
+                <p class="h2 mb-2 text-secondary">{{calculateCurrency(transactions.total?.balance)}}</p>
+            </div>
+        </div>
+    </template>
+</div>
+<div class="mb-4 col-md-8">
+    <label class="form-label">##Date_Range##</label>
+    <div class="input-group">
+        <span class="input-group-text">
+            <i class="ci-calendar"></i>
+        </span>
+        <input ref="datepicker" @change="dateChanged" class="form-control date-picker date-range"
+               type="text" placeholder="##From##"
+               data-datepicker-options='{"altInput": true, "altFormat": "F j, Y", "dateFormat": "Y-m-d"}'
+               data-linked-input="#end-date">
+        <input class="form-control date-picker" type="text" placeholder="##To##"
+               data-datepicker-options='{"altInput": true, "altFormat": "F j, Y", "dateFormat": "Y-m-d"}'
+               id="end-date">
+    </div>
+</div>
+<div class="table-responsive fs-md mb-4 mt-4">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr>
+                <th>##TransactionDate##</th>
+                <th class="text-center">##Code##</th>
+                <th class="text-center">##Notes##</th>
+                <th class="text-end">##Debit##</th>
+                <th class="text-end">##Credit##</th>
+                <th class="text-end">##ProgressiveBalance##</th>
+                <th class="text-center"></th>
+            </tr>
+        </thead>
+        <tbody v-if="transactions !=null">
+            <tr>
+                <td></td>
+                <td></td>
+                <td class="text-center">##AccountBalanceTransfer##</td>
+                <td></td>
+                <td></td>
+                <td class="py-3 text-end">
+                    <span v-if="!isLoading && transactions?.forward != null">{{calculateCurrency(transactions?.forward?.balance)}}</span>
+                </td>
+                <td></td>
+            </tr>
+            <tr v-for="(transaction, index) in transactions?.lines">
+                <template v-if="transaction.code!=0">
+                    <td class="py-3">{{formatDate(transaction.transactionDate)}}</td>
+                    <td class="py-3">{{transaction.code}}</td>
+                    <td class="py-3 text-center">{{transaction.notes}}</td>
+                    <td class="py-3 text-end">
+                        <span class="py-3 end">{{calculateCurrency(transaction.debit)}}</span>
+                    </td>
+                    <td class="py-3 text-end">
+                        <span>{{calculateCurrency(transaction.credit)}}</span>
+                    </td>
+                    <td class="py-3 text-end">
+                        <span>{{calculateCurrency(transaction.progressiveBalance)}}</span>
+                    </td>
+                    <td class="py-3 text-center">
+                        <a class="btn btn-primary btn-sm" v-if="transaction?.invoiceUrl != null"
+                           :href="transaction.invoiceUrl" target="_blank">##Invoice##</a>
+                    </td>
+                </template>
+            </tr>
+        </tbody>
+        <tbody v-if="transactions == null">
+            <tr>
+                <td class="text-center" colspan="7">
+                    <div v-bind:class="{'d-none': !isLoading}" class="spinner-border" role="status">
+                        <span class="visually-hidden">##Loading##...</span>
+                    </div>
+                    <div v-show="!isLoading && transactions != null && transactions.length === 0">
+                        <i class="ci-eye-off opacity-60 me-2"></i>##NoResults##
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="mt-4" v-if="this.transactions != null && this.transactions.length > 0"
+         class="d-flex justify-content-center">
+        <button v-if="showLoadMore" type="button" class="btn btn-outline-primary btn-sm"
+                @click="loadmore">
+            ##LoadMore##
+        </button>
+    </div>
+</div>

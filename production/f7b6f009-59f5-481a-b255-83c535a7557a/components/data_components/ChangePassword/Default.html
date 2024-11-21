@@ -1,0 +1,27 @@
+<section :id="'comp-'+this.model.id" :class="this.model?.cssClass" class="container change-password">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <h2 class="h4 fw-bold mb-0">##ChangePassword##</h2>
+            <div class="card mt-4">
+                <form class="needs-validation" novalidate @submit.prevent="checkForm">
+                    <div class="form-fields mb-4">
+                        <label class="form-label d-block" for="new-password">##newPasswordText##</label>
+                        <input class="form-control" v-model="password" type="password" name="NewPassword" id="new-password" required>
+                        <small v-if="this.passwordError===0" class="text-danger">##EmptyPasswordText##</small>
+
+                        <label class="form-label d-block" for="confirm-password">##confirmPasswordText##</label>
+                        <input class="form-control" v-model="passwordValidate" type="password" name="Password" id="confirm-password" required>
+                        <small v-if="this.passwordValidateError===0" class="text-danger">##EmptyPasswordText##</small>
+                        <small v-else-if="this.passwordValidateError===1" class="text-danger">##MismatchPasswordText##</small>
+                        <small v-else-if="this.passwordValidateError===2" class="text-danger">##PasswordPolicyText##</small>
+                        <small v-else-if="this.passwordValidateError===3" class="text-danger">##RequestError##</small>
+                    </div>
+                    <button class="btn btn-primary" type="submit">
+                        <span>##ButtonText##</span>
+                        <span v-show="isloading" class="ps-2 ms-2 spinner-border spinner-border-sm text-white"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

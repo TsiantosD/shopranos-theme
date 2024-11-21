@@ -1,0 +1,26 @@
+<h4 class="h5 fw-bold mb-3 py-3 border-bottom head__title">##Delivery##</h4>
+<div v-if="checkRun" class="d-flex flex-column align-items-center justify-content-center alert alert-light">
+    <div class="spinner-border" style="width:2rem; height:2rem;" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<div v-if="!checkRun && carriers == null && emptyAddress">
+    <div v-if="this._global.isAuthenticated" class="alert alert-light" role="alert">##FillAddressesFirstFromProfile##<span class="ms-1"><a href="/profile/addresses" target="_blank">##Address##</a></span></div>
+    <div v-else class="alert alert-light" role="alert">##ShippingError##</div>
+</div>
+<div v-else-if="!checkRun && carriers == null && !emptyAddress">
+    <div class="alert alert-light" role="alert">##FillAddressesFirst##</div>
+</div>
+<div v-if="!checkRun && (carriers!== null)" class="" id="shipping-method">
+    <div v-for="(carrier, index) in carriers" class="single-shipping py-1 d-flex align-items-center" :key="index">
+        <input type="radio" :id="carrier.carrier.id + ' ' + index" @change="setCarrier" :value="carrier.carrier.id" v-model="selectedCarrierId" class="me-2 ignoreInput" name="shipping-method" />
+        <label :for="carrier.carrier.id + ' ' + index"class="d-flex align-items-center">
+            <img width="60" v-if="carrier.carrier.logo?.link != null" :src="carrier.carrier.logo?.link" />
+            <span class="mx-1 fw-bold" v-if="carrier.carrier.logo?.link != null"> - </span>
+            <span class="text-dark fw-bold">{{carrier.shippingLine.title}}</span>
+            <span class="fw-bold">:</span>
+        </label>
+        <span class="amount ms-2">{{calculateCurrency(carrier.shippingLine.totalAmount)}}</span>
+        <span v-if="carrier.carrier.transitTime !== null" class="time ms-1 small">({{carrier.carrier.transitTime}})</span>
+    </div>
+</div>

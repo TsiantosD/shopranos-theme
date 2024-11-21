@@ -1,0 +1,20 @@
+<section :id="'comp-'+this.model.id" v-if="mapSrc !== null" :class="this.model?.cssClass" class="map-wrapper" :class="fullWidth ? 'container-fluid' : 'container'">
+    <div v-if="this.model.header !== null && this.model.header !=''"
+         :class="['d-flex', 'flex-wrap', 'mb-3 pb-3 header-wrap', getAlignmentClass(model.alignment)]">
+        <h2 class="h4 fw-bold mb-0">{{ this.model.header }}</h2>
+    </div>
+    <div class="contact-area component-wrapper" :class="fullWidth ? 'row' : ''">
+        <div class="contact-map" :class="fullWidth ? 'px-0' : ''">
+            <div :id="'map-'+this.model.id" class="row">
+                <iframe class="col"
+                        width="1080"
+                        height="560"
+                        style="border:0"
+                        loading="lazy"
+                        allowfullscreen
+                        :src="mapSrc">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</section>

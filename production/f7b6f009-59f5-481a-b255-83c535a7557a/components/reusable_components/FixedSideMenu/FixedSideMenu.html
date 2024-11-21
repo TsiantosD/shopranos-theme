@@ -1,0 +1,113 @@
+<div class="sidemenu-placeholder d-none d-lg-block"></div>
+<ul v-if="navigations?.length > 0" role="tablist" class="nav nav-tabs nav-justified mt-4 mt-lg-4 mb-0">
+    <li v-for="(nav, navIndex) in navigations" role="presentation" class="nav-item text-nowrap">
+        <a :href="'#navTab-' + navIndex" role="tab" data-bs-toggle="tab" aria-expanded="true" class="nav-link fw-medium" :class="isActive(nav,0,navIndex) ? 'active' : ''">{{nav.navigationTitle}}</a>
+    </li>
+</ul>
+<div v-if="navigations?.length > 0" data-simplebar="init" class="offcanvas-body px-0 pt-3 pb-0">
+    <div class="tab-content">
+        <div v-for="(nav, navIndex) in navigations" :id="'navTab-' + navIndex" role="tabpanel" class="sidebar-nav tab-pane fade" :class="isActive(nav,0,navIndex)? 'active show' : ''">
+            <div class="widget widget-categories">
+                <div v-if="nav.navigations?.length > 0" :id="'shop-categories-' + navIndex" class="accordion">
+                    <div v-for="(innerNav, innerIndex) in nav.navigations" class="accordion-item border-bottom">
+                        <h3 class="accordion-header px-grid-gutter">
+                            <button v-if="innerNav.navigations?.length > 0" type="button" data-bs-toggle="collapse" :data-bs-target="'#category-collapse-' + navIndex + '-' + innerIndex"
+                                aria-expanded="false" :aria-controls="'category-collapse-' + navIndex + '-' + innerIndex"
+                                class="accordion-button py-3 collapsed">
+                                <span class="d-flex align-items-center">
+                                    <img v-if="innerNav.image?.link" :src="innerNav.image?.link" width="20" height="20" class="me-2">
+                                    <div v-else width="20" height="20"></div>
+                                    {{innerNav.navigationTitle}}
+                                </span>
+                            </button>
+                            <a v-else :href="innerNav.url" class="nav-link-style d-block fs-md fw-normal py-3" :class="isActive(innerNav,1) ? 'active' : ''">
+                                <span class="d-flex align-items-center">
+                                    <img v-if="innerNav.image?.link" :src="innerNav.image?.link" width="20" height="20" class="me-2">{{innerNav.navigationTitle}}
+                                </span>
+                            </a>
+                        </h3>
+                        <div :id="'category-collapse-' + navIndex + '-' + innerIndex" :data-bs-parent="'#shop-categories-' + navIndex" :class="isActive(innerNav,1)  ? 'collapse show' : 'collapse'">
+                            <div class="px-grid-gutter pt-1 pb-4">
+                                <div class="widget widget-links">
+                                    <ul v-if="innerNav.navigations?.length > 0" class="widget-list border-0 ms-3">
+                                        <li v-for="subCategory in innerNav.navigations" class="widget-list-item mb-3" :class="isActive(subCategory,2)  ? 'active' : ''">
+                                            <a :href="subCategory.url" class="widget-list-link">{{subCategory.navigationTitle}}</a>
+                                            <ul v-if="subCategory.navigations?.length > 0" class="widget-list pt-1">
+                                                <li v-for="category in subCategory.navigations" class="widget-list-item" :class="isActive(category,3) ? 'active' : ''">
+                                                    <a :href="category.url" class="widget-list-link">{{category.navigationTitle}}</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div id="navTabProducts" role="tabpanel" class="sidebar-nav tab-pane fade active show">
+            <div class="widget widget-categories">
+                <div v-if="navigations?.length > 0 && navigations.find(f => f.navigationType == 'Categories')" id="shop-categories" class="accordion">
+                    <div v-for="(navigation, navIndex) in navigations.find(f => f.navigationType == 'Categories').navigations" class="accordion-item border-bottom">
+                        <h3 class="accordion-header px-grid-gutter">
+<button type="button" data-bs-toggle="collapse" :data-bs-target="'#category-collapse-' + navIndex" aria-expanded="false" :aria-controls="'category-collapse-' + navIndex" class="accordion-button py-3 collapsed">
+                                <span class="d-flex align-items-center">
+                                    <img :src="navigation.image?.link" width="20" height="20" class="mt-n1 me-2">{{navigation.navigationTitle}}
+                                </span>
+                            </button>
+                        </h3>
+<div :id="'category-collapse-' + navIndex" data-bs-parent="#shop-categories" class="collapse">
+                            <div class="px-grid-gutter pt-1 pb-4">
+                                <div class="widget widget-links">
+                                    <ul v-if="navigation.navigations?.length > 0" class="widget-list">
+                                        <li v-for="subCategory in navigation.navigations" class="widget-list-item mb-3">
+                                            <a :href="subCategory.url" class="widget-list-link">{{subCategory.navigationTitle}}</a>
+                                            <ul v-if="subCategory.navigations?.length > 0" class="widget-list pt-1">
+                                                <li v-for="category in subCategory.navigations" class="widget-list-item">
+                                                    <a :href="category.url" class="widget-list-link">{{category.navigationTitle}}</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="navTabMenu" role="tabpanel" class="sidebar-nav tab-pane fade">
+            <div class="widget widget-categories">
+                <div v-if="navigations?.length > 0 && navigations.filter(f => f.navigationType != 'Categories')?.length > 0" id="shop-menu" class="accordion">
+                    <div v-for="(navigation, navIndex) in navigations.filter(f => f.navigationType != 'Categories')" class="accordion-item border-bottom">
+                        <h3 class="accordion-header px-grid-gutter">
+<button v-if="navigation.navigationType == 'Brands'" type="button" data-bs-toggle="collapse" :data-bs-target="'#menu-collapse-' + navIndex" aria-expanded="false" :aria-controls="'menu-collapse-' + navIndex" class="accordion-button py-3 collapsed">
+                                <span class="d-flex align-items-center">
+                                    <img v-if="navigation.image?.link" :src="navigation.image?.link" width="20" height="20" class="mt-n1 me-2">{{navigation.navigationTitle}}
+                                </span>
+                            </button>
+                            <a v-else :href="navigation.url" class="nav-link-style d-block fs-md fw-normal py-3">
+                                <span class="d-flex align-items-center">
+                                    <img v-if="navigation.image?.link" :src="navigation.image?.link" width="20" height="20">{{navigation.navigationTitle}}
+                                </span>
+                            </a>
+                        </h3>
+<div v-if="navigation.navigationType == 'Brands'" :id="'menu-collapse-' + navIndex" data-bs-parent="#shop-menu" class="collapse">
+                            <div class="px-grid-gutter pt-1 pb-4">
+                                <div class="widget widget-links">
+                                    <ul v-if="navigation.navigations?.length > 0" class="widget-list">
+                                        <li v-for="brand in navigation.navigations" class="widget-list-item mb-3">
+                                            <a :href="brand.url" class="widget-list-link">{{brand.navigationTitle}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+</div>

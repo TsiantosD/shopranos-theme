@@ -1,0 +1,137 @@
+<div :id="'comp-'+this.model.id" v-if="showCookieBanner" class="position-fixed cookie-manager bottom-0 temp-hide">
+    <div class="card border-0 shadow">
+        <div class="card-header py-3 py-md-4 px-4 px-md-5">
+            <h5 class="card-title p mb-0">##CookieCardTitle##</h5>
+        </div>
+        <div class="card-body py-3 py-md-4 px-4 px-md-5">
+            <div class="card-text">
+                <p class="mb-0">##CookieCardDescription##</p>
+            </div>
+        </div>
+        <div class="card-footer text-center border-0 pt-2 pb-2 pb-md-4">
+            <a href="#cookie-settings-modal" data-bs-toggle="modal" data-bs-target="#cookie-settings-modal" class="mx-2 text-decoration-underline fw-semibold mb-2">##CookieSettingsPromptText##</a>
+            <button @click="handleCookieRejectAll" class="btn btn-outline-primary mx-2 px-4 py-2 fw-semibold mb-2">##RejectAllText##</button>
+            <button @click="handleCookieSaveAll" class="btn btn-primary mx-2 px-4 py-2 fw-semibold mb-2">##AcceptAllText##</button>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="cookie-settings-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header px-5">
+                <h5 class="modal-title">##ModalTitle##</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-5">
+                <p class="mb-0">##ModalDescription##</p>
+                <div class="accordion accordion-flush" id="accordionCookie">
+                    <div class="accordion-item mt-4">
+                        <h2 class="accordion-header" id="necessary-cookies-accordion">
+                            <div class="d-flex align-items-center ps-3 pe-4">
+                                <div class="form-check pe-5">
+                                    <input checked type="checkbox" disabled class="form-check-input">
+                                </div>
+                                <button class="accordion-button collapsed text-disabled fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    ##NecessaryCookieAccordionTitle##
+                                </button>
+                            </div>
+                        </h2>
+                        <div class="accordion-collapse collapse" id="collapseOne" aria-labelledby="headingOne" data-bs-parent="#accordionCookie">
+                            <div class="accordion-body">
+                                <p>##NecessaryCookieAccordionDescription##</p>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" scope="col">##Name##</th>
+                                                <th class="text-center" scope="col">##Domain##</th>
+                                                <th class="text-center" scope="col">##Usage##</th>
+                                                <th class="text-center" scope="col">##Expiration##</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center">_staging</td>
+                                                <td class="text-center">{{this.domain}}</td>
+                                                <td class="text-center">##StagingCookieDescription##</td>
+                                                <td class="text-center">Session</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">_currency</td>
+                                                <td class="text-center">{{this.domain}}</td>
+                                                <td class="text-center">##CurrencyCookieDescription##</td>
+                                                <td class="text-center">Session</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">_culture</td>
+                                                <td class="text-center">{{this.domain}}</td>
+                                                <td class="text-center">##CultureCookieDescription##</td>
+                                                <td class="text-center">Session</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">AccessToken</td>
+                                                <td class="text-center">{{this.domain}}</td>
+                                                <td class="text-center">##AccessTokenDescription##</td>
+                                                <td class="text-center">Session</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">RefreshToken</td>
+                                                <td class="text-center">{{this.domain}}</td>
+                                                <td class="text-center">##RefreshTokenDescription##</td>
+                                                <td class="text-center">Session</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">_domainPath</td>
+                                                <td class="text-center">{{this.domain}}</td>
+                                                <td class="text-center">##DomainPathDescription##</td>
+                                                <td class="text-center">Session</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="this.model.blocks && this.model.blocks.length > 0" v-for="(block, index) in this.model.blocks" class="accordion-item mt-4">
+                        <h2 class="accordion-header" :id="'heading'+index+1">
+                            <div class="d-flex align-items-center ps-3 pe-4">
+                                <div class="form-check pe-5">
+                                    <input v-model="block.toggle.isEnabled" type="checkbox" :disabled="block.toggle && block.toggle.isReadOnly" class="form-check-input">
+                                </div>
+                                <button class="accordion-button collapsed fw-bold" :class="block.toggle && block.toggle.isReadOnly ? 'text-disabled' :''" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index+1" aria-expanded="true" :aria-controls="'collapse'+index+1">
+                                    {{block.title}}
+                                </button>
+                            </div>
+                        </h2>
+                        <div class="accordion-collapse collapse" :id="'collapse'+index+1" :aria-labelledby="'collapse'+index+1" data-bs-parent="#accordionCookie">
+                            <div class="accordion-body">
+                                <p v-if="block.description!==undefined && block.description!==null && block.description!==''" v-html="block.description"></p>
+                                <div v-if="this.model.cookieTableHeaders && this.model.cookieTableHeaders.length>0 && block.rows && block.rows.length>0">
+                                    <table class="table">
+                                        <thead v-if="this.model.cookieTableHeaders.length > 0">
+                                            <tr>
+                                                <th class="text-center" v-for="header in this.model.cookieTableHeaders" scope="col">
+                                                    {{header.title}}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="row in block.rows">
+                                                <td class="text-center" v-for="col in row.columnNames">{{col.title}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer p-5 border-0">
+                <button type="button" class="btn btn-light mx-5 text-decoration-underline fw-semibold" data-bs-dismiss="modal">##Close##</button>
+                <button @click="handleCookieSave" type="button" class="btn btn-outline-primary mx-2 px-4 py-2 fw-semibold">##Save##</button>
+                <button @click="handleCookieSaveAll" type="button" class="btn btn-primary mx-2 px-4 py-2 fw-semibold">##AcceptAllText##</button>
+            </div>
+        </div>
+    </div>
+</div>

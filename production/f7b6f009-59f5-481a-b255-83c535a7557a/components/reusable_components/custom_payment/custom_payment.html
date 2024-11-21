@@ -1,0 +1,8 @@
+<h2 class="h6 pb-3 mb-2">##Choose_payment_method##</h2>
+    <div v-if="checkout.paymentMethods !== null && checkout.paymentMethods.providers.length > 0" class="" id="payment-method">
+        <div v-for="(provider, index) in checkout.paymentMethods.providers" class="">
+            <input type="radio" :id="provider.provider" @change="setPayment" :value="provider" v-model="selectedPaymentMethod" class="me-2" />
+            <label :for="provider.provider">{{provider.name}}</label>
+        </div>
+        <div class="mt-4" v-if="selectedPaymentMethod?.message" v-html="selectedPaymentMethod.message"></div>
+    </div>

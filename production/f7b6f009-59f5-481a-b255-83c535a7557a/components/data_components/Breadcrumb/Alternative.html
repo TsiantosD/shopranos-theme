@@ -1,0 +1,54 @@
+<section :id="this.model.id" class="breadcrumb-wrap alternative" :class="this.model?.cssClass">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="row">
+            <div class="col-12">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a class="text-nowrap" href="/">##Home##</a>
+                    </li>
+                    <template v-if="path === 'categories'">
+                        <template v-if="categories?.length > 0">
+                            <li v-for="category in categories" class="breadcrumb-item text-nowrap">
+                                <a :href="category.displayAsList != null && category.displayAsList ? '/categories/' + category.alias : '/category/' + category.alias">{{category.title}}</a>
+                            </li>
+                        </template>
+                        <li class="breadcrumb-item text-nowrap active" aria-current="page"><span>{{title}}</span></li>
+                    </template>
+                    <template v-if="path === 'category'">
+                        <template v-if="categories?.length > 0">
+                            <li v-for="category in categories" class="breadcrumb-item text-nowrap">
+                                <a :href="category.displayAsList != null && category.displayAsList ? '/categories/' + category.alias : '/category/' + category.alias">{{category.title}}</a>
+                            </li>
+                        </template>
+                        <li class="breadcrumb-item text-nowrap active" aria-current="page"><span>{{title}}</span></li>
+                    </template>
+                    <template v-if="path === 'collection'">
+                        <li class="breadcrumb-item text-nowrap">##Collections##</li>
+                        <li class="breadcrumb-item text-nowrap active" aria-current="page"><span>{{title}}</span></li>
+                    </template>
+                    <template v-if="path === 'brand'">
+                        <li class="breadcrumb-item text-nowrap">
+                            <a href="/brands">##Brands##</a>
+                        </li>
+                        <li class="breadcrumb-item text-nowrap active" aria-current="page"><span>{{title}}</span></li>
+                    </template>
+                    <template v-if="path === 'product' && categories?.length > 0">
+                        <li v-for="category in categories" class="breadcrumb-item text-nowrap">
+                            <a :href="category.displayAsList != null && category.displayAsList ? '/categories/' + category.alias : '/category/' + category.alias">{{category.title}}</a>
+                        </li>
+                        <li class="breadcrumb-item text-nowrap active" aria-current="page"><span>{{title}}</span></li>
+                    </template>
+                    <template v-if="path === 'blog'">
+                        <li class="breadcrumb-item text-nowrap">##BlogPosts##</li>
+                    </template>
+                    <template v-if="path === 'blog/posts'">
+                        <li class="breadcrumb-item text-nowrap">
+                            <a href="/blog/posts">##BlogPosts##</a>
+                        </li>
+                        <li class="breadcrumb-item text-nowrap active" aria-current="page"><span>{{title}}</span></li>
+                    </template>
+                </ol>
+            </div>
+        </nav>
+    </div>
+</section>

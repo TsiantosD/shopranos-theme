@@ -1,0 +1,133 @@
+<div class="row mb-4">
+<h2 class="h6 pt-1 pb-3 mb-3 border-bottom">##Billing_address_Retail##</h2>
+                    <form novalidate _lpchecked="1">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label  class="form-label" placeholder="##Street_name_and_building_number##" for="checkout-address1">##Address1##</label>
+                                    <input v-model="C_Address1" type="text" :class="ValidationClassC_Address1" id="checkout-address1" required>
+                                    <p v-if="this.C_Address1Error === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.C_Address1Error === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label"> ##Address2##</label>
+                                    <input v-model="C_Address2" type="text" placeholder="##Second_street_name##" type="text" :class="ValidationClassC_Address2" id="checkout-address2">
+                                    <p v-if="this.C_Address2Error === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.C_Address2Error === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="checkout-city">##Town_City##</label>
+                                    <input v-model="C_City" :class="ValidationClassC_City" id="checkout-city">
+                                    <p v-if="this.C_CityError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.C_CityError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="checkout-state">##State##</label>
+                                    <input v-model="C_State" :class="ValidationClassC_State" type="text" id="checkout-state">
+                                    <p v-if="this.C_StateError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.C_StateError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="checkout-county">##Country##</label>
+                                    <!-- <select v-model="B_Country" @click="loadCountries()" class="form-select" id="selected-country">
+                                        <option v-if="countries === null" selected v-bind:value="B_Country">{{customerData.address.country}}</option>
+                                        <option v-if="countries!== null" v-for="item in countries" v-bind:key="item.code" v-bind:value="item.code">{{item.name}}</option>
+                                    </select> -->
+                                    <input v-model="C_Country" :class="ValidationClassC_Country" id="checkout-county">
+                                    <p v-if="this.C_CountryError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.C_CountryError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="checkout-zip">##Postcode_ZIP##</label>
+                                    <input v-model="C_ZIP" :class="ValidationClassC_ZIP" type="text" id="checkout-zip">
+                                    <p v-if="this.C_ZIPError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.B_ZIPError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch mt-4 mb-4">
+                            <input type="checkbox" v-model="addressType" @change="clearShippingFields" class="form-check-input " id="customSwitch1">
+                            <label class="form-check-label" for="customSwitch1">Shipping same as Billing</label>
+                          </div>
+                    </form>
+
+
+<h2 class="h6 pt-1 pb-3 mb-3 border-bottom" v-if="!addressType">##Shipping_address_Retail##</h2>
+                    <form novalidate _lpchecked="1" v-if="!addressType" >
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label  class="form-label" placeholder="##Street_name_and_building_number##" for="checkout-address1">##Address1##</label>
+                                    <input v-model="B_Address1" type="text" :class="ValidationClassB_Address1" id="checkout-address1" required>
+                                    <p v-if="this.B_Address1Error === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.B_Address1Error === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label"> ##Address2##</label>
+                                    <input v-model="B_Address2" type="text" placeholder="##Second_street_name##" type="text" :class="ValidationClassB_Address2" id="checkout-address2">
+                                    <p v-if="this.B_Address2Error === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.B_Address2Error === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="checkout-city">##Town_City##</label>
+                                    <input v-model="B_City" :class="ValidationClassB_City" id="checkout-city">
+                                    <p v-if="this.B_CityError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.B_CityError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="checkout-state">##State##</label>
+                                    <input v-model="B_State" :class="ValidationClassB_State" type="text" id="checkout-state">
+                                    <p v-if="this.B_StateError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.B_StateError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="checkout-county">##Country##</label>
+                                    <!-- <select v-model="B_Country" @click="loadCountries()" class="form-select" id="selected-country">
+                                        <option v-if="countries === null" selected v-bind:value="B_Country">{{customerData.address.country}}</option>
+                                        <option v-if="countries!== null" v-for="item in countries" v-bind:key="item.code" v-bind:value="item.code">{{item.name}}</option>
+                                    </select> -->
+                                    <input v-model="B_Country" :class="ValidationClassB_Country" id="checkout-county">
+                                    <p v-if="this.B_CountryError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.B_CountryError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="checkout-zip">##Postcode_ZIP##</label>
+                                    <input v-model="B_ZIP" :class="ValidationClassB_ZIP" type="text" id="checkout-zip">
+                                    <p v-if="this.B_ZIPError === this.errorCode1" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorEmptyField##</p>
+                                    <p v-else-if="this.B_ZIPError === this.errorCode2" class="text-danger" style="width: 100%; margin-top: 0.375rem; font-size: 0.75rem;">##ErrorInputSize##</p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>

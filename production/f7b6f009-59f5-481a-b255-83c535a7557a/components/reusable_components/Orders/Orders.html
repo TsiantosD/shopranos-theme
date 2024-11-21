@@ -1,0 +1,171 @@
+<div class="orders-wrapper">
+    <div class="orders-search mb-4">
+        <input class="form-control border-theme py-3 pe-3" type="text" placeholder="##Search##" v-on:input="search" v-model="searchText" />
+        <span @click="enterClicked()" class="s-search large" style="cursor: pointer"></span>
+    </div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th class="py-3 py-md-4 text-center">##TransactionDate##</th>
+                    <th class="py-3 py-md-4 text-center">##Code##</th>
+                    <th class="py-3 py-md-4 text-center">##Status##</th>
+                    <th class="py-3 py-md-4 text-center">##Actions##</th>
+                </tr>
+            </thead>
+            <tbody v-if="orders !=null && orders.length > 0" class="infinite-scroll" @scroll="handleScroll" ref="scrollContainer">
+                <tr v-for="order in orders" :key="order.id">
+                    <td class="py-3 py-md-4 text-center">{{formatDate(order.placedAt)}}</td>
+                    <td class="py-3 py-md-4 text-center">
+                        <p class="mb-0">{{order.code}}</p>
+                    </td>
+                    <td class="py-3 py-md-4 text-center">
+                        <span v-if="order.status === 'Placed'" class="text-success">
+                            ##Placed##
+                        </span>
+                        <span v-else-if="order.status === 'Draft'" class="text-warning ">
+                            ##Draft##
+                        </span>
+                        <span v-else-if="order.status === 'Cancelled'" class="text-danger ">
+                            ##Cancelled##
+                        </span>
+                        <span v-else-if="order.status === 'Processing'" class="text-warning">
+                            ##Processing##
+                        </span>
+                        <span v-else-if="order.status === 'ToBeShipped'" class="text-warning">
+                            ##ToBeShipped##
+                        </span>
+                        <span v-else-if="order.status === 'Shipped'" class="text-success">
+                            ##Shipped##
+                        </span>
+                        <span v-else-if="order.status === 'PartialDelivery'" class="text-warning">
+                            ##PartialDelivery##
+                        </span>
+                        <span v-else-if="order.status === 'FailedToDeliver'" class="text-danger">
+                            ##FailedToDeliver##
+                        </span>
+                        <span v-else-if="order.status === 'Delivered'" class="text-success">
+                            ##Delivered##
+                        </span>
+                        <span v-else-if="order.status === 'Rejected'" class="text-danger">
+                            ##Rejected##
+                        </span>
+                        <span v-else-if="order.status === 'Completed'" class="text-success">
+                            ##Completed##
+                        </span>
+                    </td>
+                    <td class="py-3 py-md-4 text-center">
+                        <a v-on:click.stop.prevent="showOrder(order)" href="#" class="btn btn-primary btn-view px-5">
+                            <span class="d-md-none s-view large"></span>
+                            <span class="d-none d-md-block">##View##</span>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <p v-if="orders !=null && orders.length > 0 && !isLoadingMore && (this.currentPage + 1 <= this.pageCount)" class="mt-4 text-center mb-0 fw-bold text-muted d-flex flex-column align-items-center justify-content-center mx-auto" style="cursor: pointer;" @click="getMoreOrders">
+        ##More## <span class="s-arrow-long" style="cursor: inherit; transform: rotate(-90deg);"></span>
+    </p>
+    <div v-if="isLoadingMore" class="spinner-border d-flex mx-auto" role="status">
+        <span class="visually-hidden">##Loading##...</span>
+    </div>
+    <div v-if="orders === null || orders.length === 0" class="text-center py-5">
+        <div v-if="isLoading" class="spinner-border" role="status">
+            <span class="visually-hidden">##Loading##...</span>
+        </div>
+        <div v-if="!isLoading && totalCount === 0" class="text-muted">##NoResults##</div>
+    </div>
+</div>
+
+<div class="modal fade" v-bind:class="{show:showModal}" id="order-details">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-secondary p-4 mb-4">
+                <h5 v-if="selectedOrder !== null" class="modal-title">##OrderNumber## -{{selectedOrder.code}}</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"
+                    v-on:click="closeModal()"></button>
+            </div>
+            <div v-if="selectedOrder !== null" class="modal-body px-4 py-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="py-3 py-md-4 text-center">##Code##</th>
+                                <th class="py-3 py-md-4 text-center">##Product##</th>
+                                <th class="py-3 py-md-4 text-center">##Net##</th>
+                                <th class="py-3 py-md-4 text-center">##Quantity##</th>
+                                <th class="py-3 py-md-4 text-center">##TotalOrderPrice##</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(line, i) in selectedOrder.lines" style="vertical-align:middle;">
+                                <td class="py-3 py-md-4 text-center" :class="(i%2==1 ?'bg-secondary':'')">
+                                    <p v-if="line.sku !== null" class="mb-0 fw-medium">{{line.sku}}</p>
+                                </td>
+                                <td class="py-3 py-md-4 text-center" :class="(i%2==1 ?'bg-secondary':'')">
+                                    <h3 class="product-title mb-0 p fw-medium">
+                                        <a :href="productLinks[line.productId]"target="_blank">{{line.productTitle}}</a>
+                                    </h3>
+                                    <span v-if="line.size !== null"><span
+                                            class="text-muted me-2">Size:</span>{{line.size}}</span>
+                                    <span v-if="line.color !== null"><span
+                                            class="text-muted me-2">Color:</span>{{line.color}}</span>
+                                </td>
+                                <td class="py-3 py-md-4 text-center" :class="(i%2==1 ?'bg-secondary':'')">
+                                    <p class="mb-0 fw-medium">{{calculateCurrency(line.price)}}</p>
+                                </td>
+                                <td class="py-3 py-md-4 text-center" :class="(i%2==1 ?'bg-secondary':'')">
+                                    <input class="form-control"
+                                        @change="this.getCartAfterQuantityChange($event.target.value, line)"
+                                        type="number" v-model="line.quantity"
+                                        :step="line.orderQuantityStep !== null &&line.orderQuantityStep >0?line.orderQuantityStep:1"
+                                        :min="this._findMinimum(line.minOrderQuantity !== null && line.minOrderQuantity > 0 ? line.minOrderQuantity:1, line.orderQuantityStep!==null && line.orderQuantityStep>0?line.orderQuantityStep:1)">
+                                </td>
+                                <td class="py-3 py-md-4 text-center" :class="(i%2==1 ?'bg-secondary':'')">
+                                    <p class="mb-0 fw-medium">{{calculateCurrency(line.lineValue)}}</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer p-4 border-0 justify-content-start bg-secondary">
+                <div v-if="selectedOrder !== null" class="row m-0 w-100 justify-content-between mx-n2"
+                    style="flex:auto;">
+                    <div class="d-none d-lg-flex col py-3 mx-2"></div>
+                    <div class="col py-3 border mx-2 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold tag-title ms-2">##Net##: </span><span
+                            class="fw-medium me-2">{{calculateCurrency(selectedOrder.netAmount)}}</span>
+                    </div>
+                    <div class="col py-3 border mx-2 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold tag-title ms-2">##Vat##: </span><span
+                            class="fw-medium me-2">{{calculateCurrency(selectedOrder.vatAmount)}}</span>
+                    </div>
+                    <div v-if="selectedOrder?.shippingLine?.totalAmount !== null && selectedOrder?.shippingLine?.totalAmount !== undefined &&selectedOrder?.shippingLine?.totalAmount > 0"
+                        class="col py-3 border mx-2 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold tag-title ms-2">##Shipping##: </span><span
+                            class="fw-medium me-2">{{calculateCurrency(selectedOrder?.shippingLine?.totalAmount)}}</span>
+                    </div>
+                    <div v-if="selectedOrder.payment?.provider==='COD' && selectedOrder.payment?.serviceAmount!==null && selectedOrder.payment?.serviceAmount!==undefined && selectedOrder.payment?.serviceAmount>0"
+                        class="col py-3 border mx-2 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold tag-title ms-2">##Payment##: </span><span
+                            class="fw-medium me-2">{{calculateCurrency(selectedOrder.payment?.serviceAmount)}}</span>
+                    </div>
+                    <div class="col py-3 border mx-2 d-flex justify-content-between align-items-center mt-3 mt-md-0">
+                        <span class="fw-bold tag-title ms-2">##Total##: </span><span
+                            class="fw-medium me-2">{{calculateCurrency(selectedOrder.totalAmount)}}</span>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap justify-content-end pt-4 m-0 mt-3 mt-lg-5 mx-auto me-lg-0">
+                    <button v-on:click.stop.prevent="closeModal()"
+                        class="btn text-danger text-decoration-underline fw-semibold text-end text-lg-start">##Cancel##</button>
+                    <button v-on:click.stop.prevent="addToCart(selectedOrder)"
+                        class="btn btn-outline-primary fw-semibold py-2 px-4 mx-lg-3">##AddToCart##</button>
+                    <button v-on:click.stop.prevent="checkout(selectedOrder)"
+                        class="btn btn-primary fw-semibold py-2 px-4 mt-3 mt-lg-0">##Add_to_cart_and_proceed_to_checkout##</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

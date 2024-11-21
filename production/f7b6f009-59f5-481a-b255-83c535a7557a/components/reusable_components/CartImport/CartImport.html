@@ -1,0 +1,64 @@
+<div v-if="this._global.isAuthenticated" class="row align-items-end justify-content-between mb-5">
+    <div class="col-md-6 mb-2">
+        <div class="text-nowrap text-primary mb-2">
+            ##Add_file## <small>(File types: excel, csv)</small>
+        </div>
+        <label hidden for="upload" class="form-label">File</label>
+        <input ref="upload" class="form-control" type="file" id="upload" @change="uploadChange">
+        <div class="invalid-feedback" :class="{ 'd-block': hasError}">##Please_provide_a_valid_file##</div>
+    </div>
+    <div class="col-md-2 d-flex justify-content-end">
+        <button class="btn btn-primary btn-shadow" @click="openModal">
+            <div v-if="isLoading" class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <span v-if="!isLoading">
+                ##Upload##
+            </span>
+        </button>
+    </div>
+</div>
+<div ref="uploadmodal" class="modal fade" v-bind:class="{show: showModal}" id="uploadModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">##Confirm_Bulk_Order##</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close" @click="closeModal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fs-sm">##You_have_items_in_your_cart##</p>
+                <p class="fs-sm">##Are_you_sure_you_want_to_proceed_?##</p>
+            </div>
+            <div class="modal-footer">
+                <button @click="closeModal" class="btn btn-secondary btn-sm">##Cancel##</button>
+                <button @click="upload" class="btn btn-danger btn-shadow btn-sm">
+                    ##Ok##
+                    <span v-show="isLoading" class="mx-2 spinner-border spinner-border-sm text-white"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div ref="uploadmodalerror" class="modal fade" v-bind:class="{show: showModalError}" id="uploadModalError">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">##Import_Errors##</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close" @click="closeModalError"></button>
+            </div>
+            <div class="modal-body">
+                <p v-if="items != null" class="fs-sm fw-bold">{{items.length}} ##products_added_to_cart##.</p>
+                <p class="fs-sm">##The_below_products_were_not_found##:</p>
+                <ol v-if="this.errors.length >0">
+                    <li v-for="error in errors">{{error.message}}</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button @click="proceedToCart" class="btn btn-danger btn-shadow btn-sm">
+                    ##Ok##
+                    <span v-show="isLoading" class="mx-2 spinner-border spinner-border-sm text-white"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

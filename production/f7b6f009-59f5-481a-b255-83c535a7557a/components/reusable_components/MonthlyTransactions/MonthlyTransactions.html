@@ -1,0 +1,74 @@
+<div v-if="this.balsheet !== null && this.balsheet.size > 0" class="row mx-n2 pt-2">
+    <div class="col-md-4 col-sm-6 px-2 mb-4">
+        <div class="bg-secondary h-100 rounded-3 p-4 text-center">
+            <h3 class="fs-sm text-muted">##Debit##</h3>
+            <p class="h2 mb-2 text-danger">{{calculateCurrency(GetTotalDebit)}}</p>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 px-2 mb-4">
+        <div class="bg-secondary h-100 rounded-3 p-4 text-center">
+            <h3 class="fs-sm text-muted">##Credit##</h3>
+            <p class="h2 mb-2 text-success">{{calculateCurrency(GetTotalCredit)}}</p>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-12 px-2 mb-4">
+        <div class="bg-secondary h-100 rounded-3 p-4 text-center">
+            <h3 class="fs-sm text-muted">##Balance##</h3>
+            <p class="h2 mb-2 text-secondary">{{calculateCurrency(GetTotalDebit - GetTotalCredit)}}</p>
+        </div>
+    </div>
+</div>
+<div v-if="this.balsheet !== null && this.balsheet.size > 0" class="mb-4" style="max-width: 22rem">
+    <label class="form-label">##FiscalYear##</label>
+    <select class="form-select" @change="changeBalanceSheetYear" v-model="this.currentSheetKey">
+        <option v-for="key in Array.from(this.balsheet.keys())" :value="key">{{key}}</option>
+    </select>
+</div>
+<div class="table-responsive fs-md mb-4">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr>
+                <th>##Period##</th>
+                <th class="text-end">##Debit##</th>
+                <th class="text-end">##Credit##</th>
+                <th class="text-end">##Turnover##</th>
+            </tr>
+        </thead>
+        <tbody v-if="currentSheetData !=null &&  currentSheetData.length > 0">
+            <tr v-for="balance in currentSheetData">
+                <td class="py-3">{{balance.period}}</td>
+                <td class="py-3 text-end">
+                    <span class="py-3 text-center">{{calculateCurrency(balance.debit)}}</span>
+                </td>
+                <td class="py-3 text-end">
+                    <span>{{calculateCurrency(balance.credit)}}</span>
+                </td>
+                <td class="py-3 text-end"><span>{{calculateCurrency(balance.turnover)}}</span></td>
+            </tr>
+            <tr style="border-top: 2px">
+                <td class="py-3  fw-bold">##Totals##</td>
+                <td class="py-3  fw-bold text-end">{{calculateCurrency(GetTotalDebit)}}</td>
+                <td class="py-3  fw-bold text-end">{{calculateCurrency(GetTotalCredit)}}</td>
+                <td class="py-3 text-end"></td>
+            </tr>
+            <tr>
+                <td class="py-3 fw-bold">##TotalBalance##</td>
+                <td class="py-3 text-end"></td>
+                <td class="py-3 text-end"></td>
+                <td class="py-3 fw-bold text-end">{{calculateCurrency(GetTotalDebit - GetTotalCredit)}}</td>
+            </tr>
+        </tbody>
+        <tbody v-if="balsheet === null || balsheet.size === 0">
+            <tr>
+                <td class="text-center" colspan="5">
+                    <div v-bind:class="{'d-none': !isLoading}" class="spinner-border" role="status">
+                        <span class="visually-hidden">##Loading##...</span>
+                    </div>
+                    <div v-show="!isLoading && (balsheet === null || balsheet.size === 0)">
+                        <i class="ci-eye-off opacity-60 me-2"></i>##NoResults##
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

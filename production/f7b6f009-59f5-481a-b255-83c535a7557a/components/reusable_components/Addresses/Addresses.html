@@ -1,0 +1,251 @@
+<div class="addresses-wrapper" class="d-flex flex-column h-100">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="pb-4">##Addresses##</th>
+                    <th  class="pb-4 text-center" class="actions-head">##Actions##</th>
+                </tr>
+            </thead>
+            <div v-if="isLoading" class="py-4 text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">##Loading##...</span>
+                </div>
+            </div>
+            <tbody v-else>
+                <tr v-for="(address, index) in user?.addresses" :key="index">
+                    <td class="py-4 align-middle border-0" :class="(index%2==1?'bg-secondary':'')">
+                        <span v-if="!address.isEditing">
+                            {{ address?.address1}}
+                            <template v-if="address?.address2">
+                                , {{ address?.address2}}
+                            </template>
+                            <template v-if="address?.city">
+                                , {{ address?.city}}
+                            </template>
+                            <template v-if="address?.country">
+                                , {{ address?.country}}
+                            </template>
+                            <template v-if="address?.postalCode">
+                                , {{ address?.postalCode}}
+                            </template>
+                            <template v-if="address?.state">
+                                , {{ address?.state}}
+                            </template>
+                        </span>
+                        <span v-else>
+                            {{address?.editedAddress}}
+                        </span>
+                        <span class="align-middle badge bg-primary ms-2" v-if="!address.isEditing && index === 0">Primary</span>
+                    </td>
+                    <td class="py-4 align-middle border-0 text-center" :class="(index%2==1?'bg-secondary':'')">
+                        <button v-if="!address.isEditing" class="btn btn-light"
+                            @click="startEditing(address, index)">
+                            <span class="s-edit medium text-muted"><span class="d-none">##Edit##</span></span>
+                        </button>
+                        <button v-if="!address.isEditing" class="btn btn-light"
+                            @click="deleteAddress(index)" aria-label="Remove" data-bs-original-title="Remove">
+                            <span class="s-delete medium text-muted ms-lg-2"><span class="d-none">##Delete##</span></span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="align-self-end pt-4 mt-auto"><a class="btn btn-outline-primary px-5 py-2"  @click="modalOpenNew('addAddressForm')">##Creation##</a></div>
+</div>
+
+<div class="modal fade" id="editAddressForm" tabindex="-1" aria-labelledby="editAddressFormLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl h-100 d-flex align-items-center m-auto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAddressFormLabel">##Edit_Address##</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container px-0">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="editFirstName" class="form-label">##FirstName##<span class="text-danger">*</span></label>
+                            <input v-model="editedAddress.firstName" type="text" class="form-control"
+                                id="editFirstName" name="editFirstName" required=""
+                                @change="checkField('edit','editFirstName', editedAddress.firstName)">
+                            <small v-if="this.editFirstNameError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                        <div class="col-6">
+                            <label for="editLastName" class="form-label">##LastName##<span class="text-danger">*</span></label>
+                            <input v-model="editedAddress.lastName" type="text" class="form-control"
+                                id="editLastName" name="editLastName" required=""
+                                @change="checkField('edit','editLastName', editedAddress.lastName)">
+                            <small v-if="this.editLastNameError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="editEmail" class="form-label">##Email##<span class="text-danger">*</span></label>
+                            <input v-model="editedAddress.email" type="email" 
+                                class="form-control" id="editedEmail" name="editedEmail"
+                                required @change="checkField('edit','editEmail', editedAddress.email)">
+                            <small v-if="this.editEmailError === 1" class="text-danger">##ErrorEmptyField##</small>
+                            <small v-else-if="this.editEmailError === 2" class="text-danger">##InvalidEmailText##</small>
+                        </div>
+                        <div class="col-6">
+                            <label for="editPhoneNumber" class="form-label">##PhoneNumber##<span class="text-danger">*</span></label>
+                            <input v-model="editedAddress.phoneNumber" type="text" 
+                                class="form-control" id="editPhoneNumber" name="editPhoneNumber" 
+                                required @change="checkField('edit','editPhoneNumber', editedAddress.phoneNumber)">
+                            <small v-if="this.editPhoneNumberError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="editAddress" class="form-label">##Address1##<span class="text-danger">*</span></label>
+                            <input v-model="editedAddress.address1" type="text" 
+                                class="form-control" id="editAddress" name="editAddress" 
+                                required @change="checkField('edit','editAddress', editedAddress.address1)">
+                            <small v-if="this.editAddressError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                        <div class="col-6">
+                            <label for="editAddress1" class="form-label">##Address2##</label>
+                            <input v-model="editedAddress.address2" type="text" 
+                                class="form-control" id="editAddress1" name="editAddress1">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="editCity" class="form-label">##City##<span class="text-danger">*</span></label>
+                            <input v-model="editedAddress.city" type="text" 
+                                class="form-control" id="editCity" name="editCity" 
+                                required @change="checkField('edit','editCity', editedAddress.city)">
+                            <small v-if="this.editCityError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                        <div class="col-6">
+                            <label for="editCountry" class="form-label">##Country##<span class="text-danger">*</span></label>
+                            <input v-model="editedAddress.country" type="text" 
+                                class="form-control" id="editCountry" name="editCountry" 
+                                required @change="checkField('edit','editCountry', editedAddress.country)">
+                            <small v-if="this.editCountryError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="editState" class="form-label">##State##</label>
+                            <input v-model="editedAddress.state" type="text" 
+                                class="form-control" id="editState" name="editState">
+                            <small v-if="this.editStateError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                        <div class="col-6">
+                            <label for="editPostalCode" class="form-label">##Postcode_ZIP##<span class="text-danger">*</span></label>
+                            <input v-model="editedAddress.postalCode" type="number" 
+                                class="form-control" id="editPostalCode" name="editPostalCode" 
+                                required @change="checkField('edit','editPostalCode', editedAddress.postalCode)">
+                            <small v-if="this.editPostalCodeError === 1" class="text-danger">##ErrorEmptyField##</small>
+                            <small v-else-if="this.editPostalCodeError === 2" class="text-danger">##ZIPError##</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-danger col py-2 py-lg-3" data-bs-dismiss="modal">##Close##</button>
+                <button type="button" class="btn btn-primary col py-2 py-lg-3" @click="saveEditedAddress()">##Save##</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addAddressForm" tabindex="-1" aria-labelledby="addAddressFormLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl h-100 d-flex align-items-center m-auto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressFormLabel">##Create_New_Address##</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container px-0">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="newFirstName" class="form-label">##FirstName##<span class="text-danger">*</span></label>
+                            <input v-model="newFirstName" type="text" 
+                                class="form-control" id="newFirstName" name="newFirstName" 
+                                required @change="checkField('new','newFirstName', newFirstName)">
+                            <small v-if="this.newFirstNameError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                        <div class="col-6">
+                            <label for="newLastName" class="form-label">##LastName##<span class="text-danger">*</span></label>
+                            <input v-model="newLastName" type="text" 
+                                class="form-control" id="newLastName" name="newLastName" 
+                                required @change="checkField('new','newLastName', newLastName)">
+                            <small v-if="this.newLastNameError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="newEmail" class="form-label">##Email##<span class="text-danger">*</span></label>
+                            <input v-model="newEmail" type="email" 
+                                class="form-control" id="newEmail" name="newEmail" 
+                                required @change="checkField('new','newEmail', newEmail)">
+                            <small v-if="this.newEmailError === 1" class="text-danger">##ErrorEmptyField##</small>
+                            <small v-else-if="this.newEmailError === 2" class="text-danger">##InvalidEmailText##</small>
+                        </div>
+                        <div class="col-6">
+                            <label for="newPhoneNumber" class="form-label">##PhoneNumber##<span class="text-danger">*</span></label>
+                            <input v-model="newPhoneNumber" type="text" 
+                                class="form-control" id="newPhoneNumber" name="newPhoneNumber" 
+                                required @change="checkField('new','newPhoneNumber', newPhoneNumber)">
+                            <small v-if="this.newPhoneNumberError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="newAddress" class="form-label">##Address1##<span class="text-danger">*</span></label>
+                            <input v-model="newAddress" type="text" 
+                                class="form-control" id="newAddress" name="newAddress" 
+                                required @change="checkField('new','newAddress', newAddress)">
+                            <small v-if="this.newAddressError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                        <div class="col-6">
+                            <label for="newAddress1" class="form-label">##Address2##</label>
+                            <input v-model="newAddress1" type="text" 
+                                class="form-control" id="newAddress1" name="newAddress1">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="newCity" class="form-label">##City##<span class="text-danger">*</span></label>
+                            <input v-model="newCity" type="text" 
+                                class="form-control" id="newCity" name="newCity" 
+                                required @change="checkField('new','newCity', newCity)">
+                            <small v-if="this.newCityError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                        <div class="col-6">
+                            <label for="newCountry" class="form-label">##Country##<span class="text-danger">*</span></label>
+                            <input v-model="newCountry" type="text" 
+                                class="form-control" id="newCountry" name="newCountry" 
+                                required @change="checkField('new','newCountry', newCountry)">
+                            <small v-if="this.newCountryError === 1" class="text-danger">##ErrorEmptyField##</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="newState" class="form-label">##State##</label>
+                            <input v-model="newState" type="text" 
+                                class="form-control" id="newState" name="newState">
+                        </div>
+                        <div class="col-6">
+                            <label for="newPostalCode" class="form-label">##Postcode_ZIP##<span class="text-danger">*</span></label>
+                            <input v-model="newPostalCode" type="number" 
+                                class="form-control" id="newPostalCode" name="newPostalCode" 
+                                required @change="checkField('new','newPostalCode', newPostalCode)">
+                            <small v-if="this.newPostalCodeError === 1" class="text-danger">##ErrorEmptyField##</small>
+                            <small v-else-if="this.newPostalCodeError === 2" class="text-danger">##ZIPError##</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-danger col py-2 py-lg-3" @click="modalCloseNew()">##Cancel##</button>
+                <button type="button" class="btn btn-primary col py-2 py-lg-3" @click="createNewAddress(address)">##Creation##</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,161 @@
+<template v-if="!this.displayShoppingList">
+    <div class="lists-wrapper row">
+        <div v-if="isLoadingLists" class="col-6 col-md-1 d-flex justify-content-center align-items-center">
+            <div v-bind:class="{'d-none':!isLoadingLists}" class="spinner-border" role="status">
+                <span class="visually-hidden">##Loading##...</span>
+            </div>
+        </div>
+        <div v-if="!this.isLoadingLists" class="col-6 col-md-4 col-xl-3 position-relative" v-for="(list,index) in this.lists">
+            <a @click.stop.prevent="()=> this.shoppingListSelected(list.alias)" class="border card-list d-flex flex-column p-3 h-100">
+                <div class="d-flex justify-content-between">
+                    <h5 class="mb-3">{{list.title}}</h5>
+                </div>
+                <small class="text-muted">
+                    <span>{{list.items.length}}</span> ##Products##
+                </small>
+                <span class="s-shopping-card ms-auto mt-auto "></span>
+            </a>
+            <div class="list-control">
+                <template v-if="this.inputOn[index] === true">
+                    <div class="list-control__actions">
+                        <button @click="this.inputOn[index] = false" class="mb-3 text-muted d-flex align-items-center p-0 border-0" style="cursor: pointer;background: transparent;font-size:smaller">
+                            <span class="s-arrow-long small me-1"></span>##Back##
+                        </button>
+                        <input type="text" class="form-control" v-model="list.title" placeholder="Give a title" aria-label="title name" aria-describedby="button-addon2">
+                        <button class="btn btn-primary mt-3 w-100" @click="this.updateTitle(list,index)" type="button" id="button-addon2">##Change##</button>
+                    </div>
+                </template>
+                <template v-else>
+                    <button type="button" class="list-control__btn" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="d-none">##Edit##</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end p-0">
+                        <div @click.prevent="() =>this.showInput(index)" class="dropdown-item p-4">##Update_Name##</div>
+                        <div @click.prevent="() =>this.shoppingListSelected(list.alias)" class="dropdown-item p-4">##View##</div>
+                        <div @click.prevent="this.deleteList(list.alias)" class="dropdown-item p-4">##Delete##</div>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 col-xl-3 d-flex">
+            <div class="card" style="border:2px dashed var(--bs-primary);">
+                <div class="card-body px-0 py-2">
+                    <form @submit.prevent="this.createList()">
+                        <h5 class="mb-3 text-center px-3">##List_Creation##</h5>
+                        <p class="mb-4 text-center text-muted px-3">##Writeatitletocreateanewshoppinglist##</p>
+                        <div class="input-group">
+                            <input type="text" class="form-control py-2" v-model="this.title" placeholder="##Title##" required>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-outline-primary py-2">##Creation##</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </a>
+</template>
+<template v-if="this.displayShoppingList">
+    <div v-if="isLoading" class="d-flex justify-content-center align-items-center h-100">
+        <div v-bind:class="{'d-none':!isLoading}" class="spinner-border" role="status">
+            <span class="visually-hidden">##Loading##...</span>
+        </div>
+    </div>
+    <div v-else class="lists-wrapper">
+        <div class="d-flex flex-wrap align-items-stretch mb-3 mb-md-5 list-actions">
+            <button class="btn btn-outline-secondary d-flex align-items-center py-2 py-md-3 px-3 px-md-5" @click="() => this.backToShoppingLists()">
+                <span class="s-arrow-long me-2"></span>##Back##
+            </button>
+            <div v-if="this.products !==null && this.products.length > 0" class="d-flex justify-content-end ms-auto me-0 mx-md-3">
+                <button @click="()=> this.addAllToCart()" class="btn btn-outline-primary py-2 py-md-3 px-3 px-md-5">##Add_All##</button>
+            </div>
+            <div class="position-relative search-wrapper mt-3 mt-md-0 ms-md-3">
+                <input class="form-control border-theme" type="text" placeholder='##Quickly_add_product##' v-on:input="search" v-on:keyup.enter="(this.products>0)?addClickedProduct(this.products[0]):addClickedProduct(null)" v-model="searchText">
+                <span @click="(this.products>0)?addClickedProduct(this.products[0]):addClickedProduct(null)" class="s-search large" style="cursor: pointer"></span>
+                <div class="dropdown-search w-100" v-on:input="search">
+                    <ul class="dropdown-menu w-100 px-2" data-simplebar="init" data-simplebar-auto-hide="true" v-on:input="search">
+                        <li v-for="(product, index) in this.products" v-bind:key="product" class="search-item border-bottom" v-on:input="search" role="button" @click="addClickedProduct(product)">
+                            <div class="d-flex align-items-center">
+                                <a class="flex-shrink-0 img-wrap">
+                                    <img v-if="product.mediaItems.length > 0 && product.mediaItems[0].mediaType=='Image'" class="search-item__image" v-bind:src="product.mediaItems[0].link" width="64" :alt="product.title" class="my-auto py-1" style=" max-height: 80px; object-fit: cover;">
+                                    <img v-else :src="this._getNoImageUrl()" class="search-item__image" alt="" width="64" class="mx-auto" @error="handleImageError" />
+                                </a>
+                                <div class="ps-3 search-item__info">
+                                    <h6 class="search-item__title p">
+                                        <a :href="'/product/'+ product.alias">
+                                            {{product.title}}
+                                        </a>
+                                    </h6>
+                                    <span v-if="product.productVariants.length>0 && product.productVariants[0].sku!=null" class="search-item__meta">
+                                        {{product.productVariants[0].sku}}
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="this.products !==null && this.products.length > 0" class="row listProfile">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">##SKU##</th>
+                                <th class="text-center">##Product##</th>
+                                <th class="text-center">##Price##</th>
+                                <th class="text-center">##Quantity##</th>
+                                <th class="text-center">##Actions##</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(p, i) in this.getFinalProducts">
+                                <td class="py-4 text-center align-middle border-0" :class="(i%2==1?'bg-secondary':'')">
+                                    {{p.product.productVariants[p.i].sku}}
+                                </td>
+                                <td class="py-4 text-center align-middle border-0" :class="(i%2==1?'bg-secondary':'')">
+                                    <a :href="'/product/'+p.product.alias">{{p.product.title}} 
+                                        <small v-if="checkVariants(p)" class="ms-1">({{getVariants(p)}})</small>
+                                    </a>
+                                </td>
+                                <td class="py-4 text-center align-middle border-0" :class="(i%2==1?'bg-secondary':'')">
+                                    {{calculateCurrency(p.product.productVariants[p.i].price)}}
+                                </td>
+                                <td class="py-4 text-center align-middle border-0" :class="(i%2==1?'bg-secondary':'')">
+                                    <input class="form-control mx-auto"
+                                        @change="this.getListAfterQuantityChange($event.target.value, p.product, p.i)"
+                                        type="number"
+                                        v-model="p.product.productVariants[p.i].selectedQuantity"
+                                        :step="p.product.productVariants[p.i].orderQuantityStep !== null && p.product.productVariants[p.i].orderQuantityStep >0? p.product.productVariants[p.i].orderQuantityStep:1"
+                                        :min="this._findMinimum(p.product.productVariants[p.i].minOrderQuantity !== null && p.product.productVariants[p.i].minOrderQuantity > 0 ? p.product.productVariants[p.i].minOrderQuantity : 1, p.product.productVariants[p.i].orderQuantityStep!==null && p.product.productVariants[p.i].orderQuantityStep>0?p.product.productVariants[p.i].orderQuantityStep:1)">
+                                </td>
+                                <td class="py-4 text-center align-middle border-0" :class="(i%2==1?'bg-secondary':'')">
+                                    <button type="button" class="btn btn-light"
+                                        v-on:click="addSingleToCart(p.product, p.i)"
+                                        data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom"
+                                        data-bs-trigger="hover" title="##AddToCart##">
+                                        <span class="s-cart medium text-muted"><span class="d-none">##AddToCart##</span></span>
+                                    </button>
+                                    <button type="button" class="btn btn-light"
+                                        v-on:click="this.deleteFromList(p.product.id, p.product.productVariants[p.i].id, i)"
+                                        data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom"
+                                        data-bs-trigger="hover" title="##Delete##">
+                                        <span class="s-delete medium text-muted ms-lg-2"><span class="d-none">##Delete##</span></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div v-else class="text-center mt-4">
+            <h6 class="text-muted">##This_Shopping_List_has_no_products##</h6>
+        </div>
+    </div>
+</template>

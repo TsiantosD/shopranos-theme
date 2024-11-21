@@ -1,0 +1,157 @@
+<footer class="py-3 py-md-4 py-lg-5 border-top border-theme" :id="'comp-'+this.model.id" :class="this.model?.cssClass">
+    <div :class="[model.footerExtended ? 'container-lg' : 'container']">
+        <div class="row align-items-start justify-content-between" :class="[
+                {'flex-xl-nowrap': model.footerExtended || (!model.footerExtended && !allElements)}
+            ]">
+
+            <!-- Logo -->
+            <a v-if="logoExists" class="d-flex align-items-center  navbar-brand col-12 col-md-6" href="/" :class="[
+                    {'order-0': logoLeft},
+                    {'order-1': logoCenter},
+                    {'order-2': logoCenterRight},
+                    {'order-last': logoRight},
+
+                    {'justify-content-center justify-content-xl-start': logoLeft},
+                    {'justify-content-center': (((logoCenter || logoCenterRight) && allElements) || !allElements) && !((!model.footerExtended && allElements) && logoCenterRight)},
+                    {'justify-content-center justify-content-xl-end': logoRight || ((!model.footerExtended && allElements) && logoCenterRight)},
+
+                    {'flex-grow-1': !allElements},
+
+                    {'col-xl-4': ((!model.footerExtended && allElements) && !logoRight)},
+                    {'col-xl-12': ((!model.footerExtended && allElements) && logoRight)},
+
+                    {'resetWidth': ((!model.footerExtended && allElements) && logoRight)},
+
+                    {'mt-3 mt-lg-4 pt-lg-2': (!model.footerExtended && allElements) && logoRight},
+                    {'mt-3 mt-md-0': !((!model.footerExtended && allElements) && logoRight)},
+                    {'pt-0 pt-lg-4 pt-xl-0': logoCenterRight || logoRight},
+                ]">
+                <img v-if="!imageError" :src="this._getLogoUrl('--footer-bg-color')"
+                     :alt="this._company.name" @error="handleImageError" />
+                <div v-else>
+                    <span>{{this._company.name}}</span>
+                </div>
+            </a>
+
+            <!-- Menu -->
+            <div v-if="menuExists" class="menu-wrap d-flex align-items-start gap-5 col-12 col-md-6 flex-wrap resetWidth" :class="[
+                    {'order-0': menuLeft},
+                    {'order-1': menuCenter},
+                    {'order-2': menuCenterRight},
+                    {'order-last': menuRight},
+
+                    {'justify-content-center justify-content-xl-start': menuLeft},
+                    {'justify-content-center': (((menuCenter || menuCenterRight) && allElements) || !allElements) && !((!model.footerExtended && allElements) && menuCenterRight)},
+                    {'justify-content-center justify-content-xl-end': menuRight || ((!model.footerExtended && allElements) && menuCenterRight)},
+
+                    {'flex-grow-1': !allElements},
+
+                    {'col-xl-4': ((!model.footerExtended && allElements) && !menuRight)},
+                    {'col-xl-12': ((!model.footerExtended && allElements) && menuRight)},
+
+                    {'resetWidth': ((!model.footerExtended && allElements) && menuRight)},
+
+                    {'mt-3 mt-lg-4 pt-lg-2': (!model.footerExtended && allElements) && menuRight},
+                    {'mt-3 mt-md-0': !((!model.footerExtended && allElements) && menuRight)},
+                    {'pt-0 pt-lg-4 pt-xl-0': menuCenterRight || menuRight},
+                ]">
+
+                <div v-for="nav in AllColumns" class="d-flex flex-column">
+                    <a :href="nav.url">
+                        {{nav.navigationTitle}}
+                    </a>
+                    <ul v-if="nav.navigations !== null && nav.navigations.length > 0" class="list-unstyled ps-2 text-muted">
+                        <li v-for="subnav in nav.navigations">
+                            <a :href="subnav.url">
+                                {{subnav.navigationTitle}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div v-if="newsletterExists" class="newsletter-wrap d-flex align-items-center col-12 col-md-6" :class="[
+                    {'order-0': newsletterLeft},
+                    {'order-1': newsletterCenter},
+                    {'order-2': newsletterCenterRight},
+                    {'order-last': newsletterRight},
+
+                    {'justify-content-center justify-content-xl-start': newsletterLeft},
+                    {'justify-content-center': (((newsletterCenter || newsletterCenterRight) && allElements) || !allElements) && !((!model.footerExtended && allElements) && newsletterCenterRight)},
+                    {'justify-content-center justify-content-xl-end': newsletterRight || ((!model.footerExtended && allElements) && newsletterCenterRight)},
+
+                    {'flex-grow-1': !allElements},
+
+                    {'col-xl-4': ((!model.footerExtended && allElements) && !newsletterRight)},
+                    {'col-xl-12': ((!model.footerExtended && allElements) && newsletterRight)},
+
+                    {'resetWidth': ((!model.footerExtended && allElements) && newsletterRight)},
+                    {'rightPos': newsletterRight || (newsletterCenterRight && !model.footerExtended)},
+
+                    {'mt-3 mt-lg-4 pt-lg-2': (!model.footerExtended && allElements) && newsletterRight},
+                    {'mt-3 mt-lg-0': !((!model.footerExtended && allElements) && newsletterRight)},
+                    {'pt-0 pt-lg-4 pt-xl-0': newsletterCenterRight || newsletterRight},
+                ]">
+                <form action="" method="post" name="mc-embedded-subscribe-form" target="_blank" novalidate="">
+                    <div class="input-group flex-nowrap">
+                        <input v-model="email" class="form-control px-3 py-2 px-lg-4 py-lg-3 z-2 border-theme" type="email" name="EMAIL" placeholder="email" required="" />
+                        <button @click.prevent="subscribeEmail" class="btn btn-primary ms-n4 px-3 px-lg-4 z-3" type="submit" name="subscribe">
+                            <span v-bind:class="{hidden: isLoading}"> ##Subscribe## </span>
+                            <span v-bind:class="{hidden: !isLoading}" class="spinner-border spinner-border-sm d-none"
+                                  role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <p v-if="this.emailIsValid===false" class="text-danger">
+                        ##mailError##
+                    </p>
+                    <p v-if="this.showEmailValidMessage===true" class="text-success">
+                        ##emailValid##
+                    </p>
+                    <div class="subscription-status"></div>
+                </form>
+            </div>
+
+            <!-- Social -->
+            <div v-if="socialExists" class="d-flex align-items-center col-12 col-md-6" :class="[
+                    {'order-0': socialLeft},
+                    {'order-1': socialCenter},
+                    {'order-2': socialCenterRight},
+                    {'order-last': socialRight},
+
+                    {'justify-content-center justify-content-xl-start': socialLeft},
+                    {'justify-content-center': (((socialCenter || socialCenterRight) && allElements) || !allElements) && !((!model.footerExtended && allElements) && socialCenterRight)},
+                    {'justify-content-center justify-content-xl-end': socialRight || ((!model.footerExtended && allElements) && socialCenterRight)},
+
+                    {'flex-grow-1': !allElements},
+
+                    {'col-xl-4': ((!model.footerExtended && allElements) && !socialRight)},
+                    {'col-xl-12': ((!model.footerExtended && allElements) && socialRight)},
+
+                    {'resetWidth': ((!model.footerExtended && allElements) && socialRight)},
+
+                    {'mt-3 mt-lg-4 pt-lg-2': (!model.footerExtended && allElements) && socialRight},
+                    {'mt-3 mt-lg-0': !((!model.footerExtended && allElements) && socialRight)},
+                    {'pt-0 pt-lg-4 pt-xl-0': socialCenterRight || socialRight},
+				]">
+                <ul v-if="model.socialBlock.socials.length > 0" class="d-flex list-unstyled m-0">
+                    <li v-for="social in model.socialBlock.socials" class="mx-2">
+                        <a href="" target="_blank" :class="('s-' + social.socialName.toLowerCase())" :class="{'large': model.footerExtended}"><span>{{social.socialName}} ##Link##</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row align-items-center text-center pt-4 copyright"
+             :class="[
+				{'pt-xl-5 mt-xl-3': !(!model.footerExtended && allElements)},
+				{'pt-xl-2 mt-xl-2': !model.footerExtended && allElements}
+			]">
+            <div class="col-12">
+                <p class="m-0">
+                    © ##All rights reserved. Powered by##
+                    <a :href="this.shopranosUrl">Shopranos</a>. {{globaldata.version}}
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

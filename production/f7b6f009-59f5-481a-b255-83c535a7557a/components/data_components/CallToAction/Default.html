@@ -1,0 +1,12 @@
+<section class="container call-to-action" :id="'comp-'+this.model.id" :class="this.model?.cssClass">
+    <div v-if="this.model.header !== null && this.model.header !=''"
+         :class="['d-flex', 'flex-wrap', 'mb-3 pb-3 header-wrap', getAlignmentClass(model.alignment)]">
+        <h2 class="h4 fw-bold mb-0">{{ this.model.header }}</h2>
+    </div>
+    <div class="row justify-content-center align-items-center">
+        <div v-if="this.text !== null && this.text !== ''" class="text-center col-lg-5" :class="[{'text-lg-end': buttonOrientation==0}, {'order-last': (buttonOrientation==1 || buttonOrientation==2)}, {'col-lg-7': (buttonOrientation==2 || buttonOrientation==3)}, {'pt-4': buttonOrientation==2 && this.buttonText !== null && this.buttonText !== ''}, {'pb-4': buttonOrientation==3 && this.buttonText !== null && this.buttonText !== ''}]" v-html="text"></div>
+        <div v-if="this.buttonText !== null && this.buttonText !== ''" :class="[{'col-lg-4': (buttonOrientation==0 || buttonOrientation==1)}, {'text-center text-lg-end': buttonOrientation==1}, {'text-center': (buttonOrientation==2 || buttonOrientation==3)}]">
+            <a :href="this.buttonLink" class="btn btn-primary text-center">{{buttonText}}</a>
+        </div>
+    </div>
+</section>

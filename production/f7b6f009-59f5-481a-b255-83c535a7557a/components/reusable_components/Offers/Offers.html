@@ -1,0 +1,115 @@
+<div class="row">
+    <div class="col-md-4">
+        <label class="form-label" for="offer-status">##Status##</label>
+        <select class="form-select" id="offer-status" v-model="selectedOfferStatus" @change="changeOfferStatus($event)">
+            <option v-for="status in offerStatuses" :value="status">
+                <span v-if="status === 'All'">##All##</span>
+                <span v-if="status === 'Draft'">##Draft##</span>
+                <span v-if="status === 'Open'">##Open##</span>
+                <span v-if="status === 'Accepted'">##Accepted##</span>
+                <span v-if="status === 'Rejected'">##Rejected##</span>
+            </option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label" for="offer-status">##Sort##</label>
+        <select class="form-select" id="offer-status" v-model="selectedOfferSort" @change="changeOfferSort($event)">
+            <option v-for="sort in offerSorts" :value="sort">
+                <span v-if="sort === 'ExpiresAt'">##ExpirationDate##</span>
+                <span v-if="sort === 'UpdateDate'">##UpdateDate##</span>
+            </option>
+        </select>
+    </div>
+</div>
+
+<div class="table-responsive fs-md mb-4">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr>
+                <th class="text-start">##Title##</th>
+                <th class="text-center">##Status##</th>
+                <th class="text-center">##ExpirationDate##</th>
+                <th class="text-start">##CustomerName##</th>
+                <th class="text-center">##Actions##</th>
+            </tr>
+        </thead>
+        <tbody v-if="offers !=null && offers.length > 0">
+            <tr v-for="offer in offers">
+                <td class="py-3 text-start">{{offer.title}}</td>
+                <td class="py-3 text-center">
+                    <span v-if="offer.status ==='Open' || offer.status === 1" class="badge bg-accent">
+                        ##Open##
+                    </span>
+                    <span v-else-if="offer.status ==='Draft' || offer.status === 0" class="badge bg-warning">
+                        ##Draft##
+                    </span>
+                    <span v-else-if="offer.status ==='Rejected' || offer.status === 3" class="badge bg-danger">
+                        ##Rejected##
+                    </span>
+                    <span v-else-if="offer.status ==='Accepted' || offer.status === 2" class="badge bg-success">
+                        ##Success##
+                    </span>
+                </td>
+                <td class="py-3 text-center">{{formatDate(offer.expiresAt)}}</td>
+                <td class="py-3 text-start">{{offer.contact?.firstName}} {{offer.contact?.lastName}}</td>
+                <td class="py-3 text-center">
+                    <a :href="navigateToOffer(offer)" class="btn btn-primary btn-sm">##View##</a>
+                </td>
+            </tr>
+        </tbody>
+        <tbody v-if="offers === null || offers.length === 0">
+            <tr>
+                <td class="text-center" colspan="5">
+                    <div v-bind:class="{'d-none': !isLoading}" class="spinner-border" role="status">
+                        <span class="visually-hidden">##Loading##...</span>
+                    </div>
+                    <div v-show="!isLoading && totalCount === 0">
+                        <i class="ci-eye-off opacity-60 me-2"></i>##NoResults##
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<nav v-if="offers!=null && offers.length>0" class="d-flex justify-content-between pt-2"
+     aria-label="Page navigation">
+    <ul class="pagination">
+        <li class="page-item">
+            <a class="page-link" href="#" v-on:click.prevent="prevPage()">
+                <i class="ci-arrow-left me-2"></i>##Prev##
+            </a>
+        </li>
+    </ul>
+    <ul class="pagination">
+
+        <li v-if="ShowFirstPage" class="page-item d-none d-sm-block">
+            <a class="page-link" href="#" v-on:click.prevent="pagination(1)">1</a>
+        </li>
+        <li v-if="ShowPreviousPage">
+            <div class="p-1">...</div>
+        </li>
+        <li v-if="ShowPreviousPage" class="page-item d-none d-sm-block">
+            <a class="page-link" href="#" v-on:click.prevent="prevPage()">{{PreviousPage}}</a>
+        </li>
+
+        <li class="page-item active d-none d-sm-block" aria-current="page">
+            <span class="page-link">{{currentPage}} <span class="visually-hidden">(current)</span></span>
+        </li>
+
+        <li v-if="ShowNextPage" class="page-item d-none d-sm-block">
+            <a class="page-link" href="#" v-on:click.prevent="nextPage()">{{NextPage}}</a>
+        </li>
+        <li v-if="ShowNextPage">
+            <div class="p-1">...</div>
+        </li>
+        <li v-if="ShowLastPage" class="page-item d-none d-sm-block">
+            <a class="page-link" href="#" v-on:click.prevent="pagination(LastPage)">{{LastPage}}</a>
+        </li>
+    </ul>
+    <ul class="pagination">
+        <li class="page-item">
+            <a class="page-link" href="#" aria-label="Next"
+               v-on:click.prevent="nextPage()">##Next##<i class="ci-arrow-right ms-2"></i></a>
+        </li>
+    </ul>
+</nav>

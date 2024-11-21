@@ -1,0 +1,156 @@
+<section :id="'comp-'+this.model.id" :class="this.model?.cssClass" class="container-md single-blog">
+    <div class="row">
+        <div class="col-12">
+            <div v-if="this.blogCategory!==undefined && this.blogCategory!==null" class="single-blog__category mb-4">
+                <a :href="'/blog/posts/'+this.blogCategory.alias" class="btn btn-secondary fw-bold py-2 px-4">{{this.blogCategory.title}}</a>
+            </div>
+            <h1 class="h2 mb-4 single-blog__title">{{this.blog.title}}</h1>
+            <span class="line d-block mb-4"></span>
+            <div class="single-blog__info d-flex flex-wrap align-items-center small mb-4">
+                <div class="single-blog__author d-flex align-items-center pe-2 me-2 border-end">
+                    <span v-if="this.calculateAuthorData() !== ''" class="single-blog__author-data">
+                        <div v-if="blog?.authorProfileImage != null  && blog?.authorProfileImage?.link !=null" class="single-blog__author-avatar">
+                            <img :src="blog?.authorProfileImage?.link" onerror="this.style.display='none';" alt="Author image">
+                        </div>
+                        <span class="single-blog__author-name fw-bold">{{this.calculateAuthorData()}}</span>
+                    </span>
+                    <span v-else class="single-blog__author-name fw-bold">{{this._company.name}} ##Team##</span>
+                </div>
+                <span class="single-blog__date text-secondary">{{this.getDate(this.blog.publishedAt)}}</span>
+                <span v-if="readingTime" class="single-blog__readTime">
+                    <span v-if="time.hours >= 0">{{time.hours}} ##hours##</span>
+                    <span v-if="time.minutes == -2">< 1 ##minutes##</span>
+                    <span v-else-if="time.minutes >= 0">{{time.minutes}} ##minutes##</span> ##read##
+                </span>
+            </div>
+            <div v-if="blog.mediaItem!==null && blog.mediaItem!==undefined" class="single-blog__image mb-4">
+                <img :src="blog.mediaItem.link" :alt="blog.header" onerror="this.style.display='none'">
+            </div>
+            <div class="single-blog__content-wrap mb-4">
+                <div class="single-blog__share">
+                    <a :href="'https://www.facebook.com/sharer/sharer.php?u='+'bla'" target="_blank">
+                        <span class="s-facebook large"><span class="d-none">Facebook ##Link##</span></span>
+                    </a>
+                    <a :href="'https://www.linkedin.com/shareArticle?mini=true&url='+'bla'" target="_blank">
+                        <span class="s-linkedin large"><span class="d-none">Linkedin ##Link##</span></span>
+                    </a>
+                </div>
+                <div class="single-blog__content-wrap__inner">
+                    <div class="single-blog__content" v-html="blog.content" id="article-wrap"></div>
+                </div>
+            </div>
+
+            <div class="single-blog__tags-wrap border-top">
+                <div v-if="this.blog.tags!==undefined && this.blog.tags!==null&&this.blog.tags.length>0" class="single-blog__tags mt-2">
+                    <span v-for="(tag, index) in blog.tags" class="me-1">
+                        {{tag}}<span v-if="index !== blog.tags.length - 1">,</span>
+                    </span>
+                </div>
+            </div>
+            <div v-if="this.model.allowComments" class="single-blog__comments mt-5" id="comments">
+                <h2 class="h4">
+                    ##Comments##<span class="badge bg-secondary text-body align-middle ms-2">{{this.totalComments}}</span>
+                </h2>
+                <div v-if="!isLoadingData" v-for="(comment, index) in this.comments" class="d-flex align-items-start py-4 border-bottom">
+                    <img class="rounded-circle" onerror="this.src='/images/blank.png';"
+                         :src="comment.profileImage?.link??'/images/blank.png'" width="50" :alt="'commenter-'+index+1">
+                    <div class="ps-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fs-md mb-0">{{this.calculateCommenterName(comment)}}</h6>
+                        </div>
+                        <p class="fs-md mb-1">{{comment.comment}}</p>
+                        <span v-if="comment.insertDate" class="fs-ms text-muted">
+                            <i class="ci-time align-middle me-2"></i>{{getDate(comment.insertDate)}}
+                        </span>
+                    </div>
+                </div>
+                <div v-else class="d-flex flex-column align-items-center justify-content-center py-4">
+                    <div class="spinner-grow spinner-grow-sm body-secondary-text" style="width: 2rem; height: 2rem;" role="status">
+                        <span class="visually-hidden">##Loading##...</span>
+                    </div>
+                </div>
+                <nav v-if="pageCount > 1" class="d-flex justify-content-between pt-5 mb-4" aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link" href="#" v-on:click.prevent="prevPage()">
+                                <i class="ci-arrow-left me-2"></i>##Prev##
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="pagination">
+                        <li v-if="ShowFirstPage" class="page-item d-none d-sm-block">
+                            <a class="page-link" href="#" v-on:click.prevent="pagination(1)">1</a>
+                        </li>
+                        <li v-if="ShowPreviousPage">
+                            <div class="p-1">...</div>
+                        </li>
+                        <li v-if="ShowPreviousPage" class="page-item d-none d-sm-block">
+                            <a class="page-link" href="#" v-on:click.prevent="prevPage()">{{PreviousPage}}</a>
+                        </li>
+
+                        <li class="page-item active d-none d-sm-block" aria-current="page">
+                            <span class="page-link">{{currentPage}} <span class="visually-hidden">(current)</span></span>
+                        </li>
+
+                        <li v-if="ShowNextPage" class="page-item d-none d-sm-block">
+                            <a class="page-link" href="#" v-on:click.prevent="nextPage()">{{NextPage}}</a>
+                        </li>
+                        <li v-if="ShowNextPage">
+                            <div class="p-1">...</div>
+                        </li>
+                        <li v-if="ShowLastPage" class="page-item d-none d-sm-block">
+                            <a class="page-link" href="#" v-on:click.prevent="pagination(LastPage)">{{LastPage}}</a>
+                        </li>
+                    </ul>
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next" v-on:click.prevent="nextPage()">
+                                ##Next##<i class="ci-arrow-right ms-2"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="new-comment">
+                    <div class="card border-0 shadow mt-2 mb-4">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                <img onerror="this.src='/images/blank.png';" class="rounded-circle" :src="this.user?.profileImage?.link??'/images/blank.png'" width="50" alt="user image">
+                                <form class="w-100 needs-validation ms-3" novalidate="">
+                                    <div class="mb-2 position-relative">
+                                        <input v-model="this.nickname" class="form-control" maxlength="50" type="text" placeholder="##Nickname##" autocomplete="off">
+                                        <div class="maxLength text-secondary position-absolute end-0 me-2 top-50 translate-middle-y">
+                                            {{this.nickname?.length}}/50
+                                        </div>
+                                        <small v-if="nicknameHasValidationError===true" class="text-danger w-100 mt-2 d-block" style="font-size: 0.75rem;">##NicknameInvalidMessage##</small>
+                                    </div>
+                                    <div class="mb-2 position-relative">
+                                        <textarea v-model="this.comment" class="form-control" rows="4" placeholder="##CommentDescription##" maxlength="500" required=""></textarea>
+                                        <div class="maxLength text-secondary position-absolute end-0 me-2 mt-2 top-0">
+                                            {{this.comment?.length}}/500
+                                        </div>
+                                        <small v-if="commentHasValidationError===true" class="text-danger w-100 mt-2 d-block" style="font-size: 0.75rem;">##CommentInvalidMessage##</small>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" v-on:click.prevent="this.postComment()">
+                                        <span class="align-middle" :class="this.isPostingComment?'pe-3':''">##PostComment##</span>
+                                        <span v-if="this.isPostingComment" class=" align-middle spinner-border spinner-border-sm text-muted" role="status"></span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toast-wrapper" v-bind:class="commentPublishedToastClass">
+                        <div class="toast" v-bind:class="commentPublishedToastClass" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header bg-success text-white">
+                                <i class="ci-check-circle me-2"></i>
+                                <span class="fw-medium me-auto"></span>
+                                <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body text-center text-success">##CommentPublishedWaitingForAcceptMessage##</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
