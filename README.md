@@ -16,3 +16,8 @@ https://trial-2447.shopranos.eu/product/nike-running-react-pegasus-trail-4-gore-
 
 #### Publishing
 To publish the changes to the production eshop, go to [Shopranos Dashboard](https://platform.shopranos.eu/) > Online Store > Theme Configurator and click the "Publish" button.
+
+## Documentation
+https://developers.shopranos.eu/
+
+source: https://www.youtube.com/watch?v=QlNzhx6V3a8&ab_channel=SOFTONE
