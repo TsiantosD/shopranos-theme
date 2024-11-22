@@ -55,7 +55,7 @@ const productscarouseldefault = {
                         700: {
                             slidesPerView: 2,
                             slidesPerGroup: 4,
-                            spaceBetween: 20,
+                            spaceBetween: 0,
                             grid: {
                                 rows: 2,
                                 fill: "row"
@@ -64,7 +64,7 @@ const productscarouseldefault = {
                         1100: {
                             slidesPerView: 3,
                             slidesPerGroup: 3,
-                            spaceBetween: 40,
+                            spaceBetween: 0,
                             grid: {
                                 rows: 2,
                                 fill: "row"
@@ -91,12 +91,12 @@ const productscarouseldefault = {
                         700: {
                             slidesPerView: 2,
                             slidesPerGroup: 2,
-                            spaceBetween: 16 * 3,
+                            spaceBetween: 0,
                         },
                         1100: {
                             slidesPerView: 3,
                             slidesPerGroup: 3,
-                            spaceBetween: 16 * 3,
+                            spaceBetween: 0,
                         },
                     }
                 }

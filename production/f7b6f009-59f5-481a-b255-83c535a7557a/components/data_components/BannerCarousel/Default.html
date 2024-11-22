@@ -22,7 +22,7 @@
                             <p v-if="(banner.subHeader!=null && banner.subHeader!='')" class="banner-subHeader" :style="'color:'+banner.textColor">{{banner.subHeader}}</p>
                             <div v-if="(banner.text!=null && banner.text!='')" class="banner-text" :style="'color:'+banner.textColor" v-html="banner.text"></div>
                             <div v-if="banner.buttonText!=null &&  banner.buttonText!=''" class="banner-button">
-                                <a class="btn btn-primary btn-shadow rounded-0 fs-xs " :href="banner.buttonLink">{{banner.buttonText}}</a>
+                                <a class="btn btn-primary rounded-0 fs-xs " :style="{outline: '0.1rem solid var(--bs-primary)'}" :href="banner.buttonLink">{{banner.buttonText}}</a>
                             </div>
                         </div>
                         <div v-if="banner.elements.includes(2) && (banner.image!=null && banner.image!='')" class="img-wrap px-5 px-lg-4 px-xl-5"

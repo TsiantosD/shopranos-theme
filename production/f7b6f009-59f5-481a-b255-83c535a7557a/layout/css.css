@@ -1,0 +1,35 @@
+.main-text{
+    color: rgb(24, 0, 0) !important;
+    font-size: 20px !important;
+    font-weight: 1000 !important;
+    letter-spacing: 2px !important;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+
+.card-icing{
+    outline: 0.1rem solid var(--bs-primary);
+    box-sizing: border-box;
+    margin-top: 1rem;
+    padding: 0!important;
+    background-size: 100%!important;
+    background-position: center;
+    -webkit-transition: all 0.2s ease-in-out!important;
+    transition: all 0.2s ease-in-out!important; /* Add standard transition for all states */
+}
+
+.card-icing:hover {
+    background-size: 125%!important;
+    filter: blur(8px);
+}
+.card-icing:hover > .product-icing {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.product-icing{
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 1rem;
+    backdrop-filter: blur(8px);
+    -webkit-transition: all 0.2s ease-in-out!important;
+    transition: all 0.2s ease-in-out!important; /* Add standard transition for all states */
+}

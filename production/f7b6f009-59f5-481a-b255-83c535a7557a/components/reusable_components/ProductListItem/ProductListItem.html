@@ -1,12 +1,12 @@
-<div class="card product-wrap">
+<div class="card product-wrap card-icing"   :style="{
+    backgroundImage: 'url(' + this._getMediaItem(product.mediaItems)+ ')',
+    backgroundSize: 'cover'
+ }"
+>
     <div v-if="product.additionalFeatures.icoTags !== null" class="product-badge" v-html="this._getBadges(product)">
     </div>
-    <div class="product-thumb">
-        <a :href="'/product/'+product.alias"class="img-wrap">
-            <img v-if="this._getMediaItem(product.mediaItems)!==null" :src="this._getMediaItem(product.mediaItems)"
-                alt="Product" @error="handleImageError">
-            <img v-else :src="this._getNoImageUrl()" alt="Product" width="200" @error="handleImageError"
-                class="no-img" />
+    <div class="product-thumb" style="height: 15rem;">
+        <a :href="'/product/'+product.alias"class="img-wrap"></a>
             </a>
             <!-- Shopping Lists -->
             <button v-if="this._resolveModules('shoppinglists')" class="btn btn-light product-list"
@@ -14,11 +14,11 @@
                 <span class="s-heart large"><span>##ShoppingLists##</span></span>
             </button>
     </div>
-    <div class="product-info">
+    <div class="product-info product-icing">
         <h3 class="product-title p">
             <a v-if="product.productVariants[0].title !== null"
                 :href="'/product/'+product.alias">{{product.productVariants[0].title}}</a>
-            <a v-else :href="'/product/'+product.alias">{{product.title}}</a>
+            <a class="main-text" v-else :href="'/product/'+product.alias">{{product.title}}</a>
         </h3>
         <span v-if="product.productVariants.length>0 && product.productVariants[0].sku!=null"
             class="product-sku">{{product.productVariants[0].sku}}</span>
