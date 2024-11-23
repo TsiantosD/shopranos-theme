@@ -1,0 +1,23 @@
+# TODO List
+
+## Pages
+- [ ] Check checkout flow
+    - [ ] 
+- [ ] Change home
+
+## Components
+All components should be:
+- a. customized
+- b. compatible with platform features
+- c. responsive to all devices
+
+- [x] Products carousel
+- [ ] Images carousel
+
+## Theme (Vape store)
+- [ ] Choose color palette (apply it to dashboard)
+- [ ] Remove any unecessary/unrelated items (products, categories, images etc)
+- [ ] Add vape products
+- [ ] Add images to match the theme
+- [ ] Change categories
+
