@@ -37,3 +37,28 @@
     -webkit-transition: all 0.2s ease-in-out!important;
     transition: all 0.2s ease-in-out!important; /* Add standard transition for all states */
 }
+
+/* .standard-btns > [class^=s-] */
+/* .standard-btns > [class*=" s-"], */
+/* .standard-btns > span::before, */
+.navbar-tool.btn,
+.s-notification,
+#navcart-icon {
+/* [class^=s-], */
+/* [class*=" s-"] */
+    color: var(--header-txt-color) !important;
+}
+
+.navbar-search {
+    background-color: var(--header-bg-color) !important;
+    color: var(--header-txt-color) !important;
+}
+
+.border-theme.navbar-search {
+    border-color: var(--header-txt-color) !important;
+    color: var(--header-txt-color) !important;
+}
+
+.border-theme.navbar-search::placeholder {
+    color: var(--header-txt-color) !important;
+}

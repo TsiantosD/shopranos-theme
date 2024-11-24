@@ -153,7 +153,7 @@
                     {'ms-auto me-lg-0 ms-lg-auto': ((searchRight || searchCenter) && sticky && !menuLeft) || (sticky && menuLeft && searchRight)},
 
                 ]">
-                <input class="form-control border-theme" type="text" placeholder="##SearchForProducts##" v-on:input="Search"
+                <input class="form-control border-theme navbar-search" type="text" placeholder="##SearchForProducts##" v-on:input="Search"
                        @keyup.enter="enterClicked()" v-model="SearchText" />
                 <span @click="enterClicked()" class="s-search large" style="cursor: pointer"></span>
                 <div class="dropdown-search w-100 position-absolute bottom-0">

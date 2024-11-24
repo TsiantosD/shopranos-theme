@@ -4141,7 +4141,6 @@ a.btn,
 }
 
 :root {
-  --bs-border-color: var(--border-color) !important;
   --bs-btn-active-border-color: transparent;
   --bs-body-bg: var(--body-bg-first-color);
   --bs-body-color: var(--body-primary-txt-color);
@@ -4149,6 +4148,8 @@ a.btn,
   --bs-form-invalid-color: var(--bs-danger);
   --bs-navbar-brand-color: var(--bs-body-color) !important;
   --btn-bg-color: var(--body-primary-txt-color);
+  --bs-border-color: var(--border-color) !important;
+  --border-color: var(--body-primary-txt-color) !important;
 }
 
 body a:not(.btn):not(.nav-link) {
@@ -4238,7 +4239,7 @@ body .text-secondary {
   color: var(--body-secondary-txt-color) !important;
 }
 body .bg-secondary {
-  background-color: var(--body-bg-second-color) !important;
+  background-color: var(--header-bg-second-color) !important;
 }
 body .alert-light {
   background-color: var(--body-bg-second-color) !important;
