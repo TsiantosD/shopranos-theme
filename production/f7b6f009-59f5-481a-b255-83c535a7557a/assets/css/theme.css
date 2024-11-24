@@ -909,57 +909,57 @@ body {
 
 @media only screen and (min-width: 1440px) {
   .banner-carousel .banners-wrap .single-banner .text-wrap .banner-header {
-    font-size: min(max(42px, 42 / 1440 * 100vw), 46px) !important;
+    font-size: min(max(90px, 90 / 1440 * 100vw), 90px) !important;
   }
 }
 @media only screen and (min-width: 744px) and (max-width: 1439px) {
   .banner-carousel .banners-wrap .single-banner .text-wrap .banner-header {
-    font-size: min(max(22px, 22 / 744 * 100vw), 38px) !important;
+    font-size: min(max(70px, 70 / 744 * 100vw), 70px) !important;
   }
 }
 @media only screen and (max-width: 743px) {
   .banner-carousel .banners-wrap .single-banner .text-wrap .banner-header {
-    font-size: min(max(22px, 22 / 375 * 100vw), 22px) !important;
+    font-size: min(max(40px, 40 / 375 * 100vw), 40px) !important;
   }
 }
 @media only screen and (min-width: 1921px) {
   .banner-carousel .banners-wrap .single-banner .text-wrap .banner-header {
-    font-size: calc(46px * 1.5) !important;
+    font-size: calc(90px * 1.5) !important;
   }
 }
 @media only screen and (min-width: 1440px) {
   .banner-carousel .banners-wrap .swiper-wrapper.oneCols .banner-header {
-    font-size: min(max(42px, 42 / 1440 * 100vw), 46px) !important;
+    font-size: min(max(42px, 42 / 1440 * 100vw), 90px) !important;
   }
 }
 @media only screen and (min-width: 744px) and (max-width: 1439px) {
   .banner-carousel .banners-wrap .swiper-wrapper.oneCols .banner-header {
-    font-size: min(max(22px, 22 / 744 * 100vw), 38px) !important;
+    font-size: min(max(40px, 40 / 744 * 100vw), 70px) !important;
   }
 }
 @media only screen and (max-width: 743px) {
   .banner-carousel .banners-wrap .swiper-wrapper.oneCols .banner-header {
-    font-size: min(max(22px, 22 / 375 * 100vw), 22px) !important;
+    font-size: min(max(40px, 40 / 375 * 100vw), 40px) !important;
   }
 }
 @media only screen and (min-width: 1921px) {
   .banner-carousel .banners-wrap .swiper-wrapper.oneCols .banner-header {
-    font-size: calc(46px * 1.5) !important;
+    font-size: calc(90px * 1.5) !important;
   }
 }
 @media only screen and (min-width: 1440px) {
   .banner-carousel .banners-wrap .swiper-wrapper.twoCols .banner-header {
-    font-size: min(max(44px, 44 / 1440 * 100vw), 48px) !important;
+    font-size: min(max(90px, 44 / 1440 * 100vw),90x) !important;
   }
 }
 @media only screen and (min-width: 744px) and (max-width: 1439px) {
   .banner-carousel .banners-wrap .swiper-wrapper.twoCols .banner-header {
-    font-size: min(max(24px, 24 / 744 * 100vw), 40px) !important;
+    font-size: min(max(70px, 24 / 744 * 100vw), 70px) !important;
   }
 }
 @media only screen and (max-width: 743px) {
   .banner-carousel .banners-wrap .swiper-wrapper.twoCols .banner-header {
-    font-size: min(max(24px, 24 / 375 * 100vw), 24px) !important;
+    font-size: min(max(40px, 24 / 375 * 100vw), 40px) !important;
   }
 }
 @media only screen and (min-width: 1921px) {
@@ -12059,7 +12059,7 @@ body header.topBarTop.stickyNavbarWrap .topbar {
   }
 }
 .banner-carousel .banners-wrap .swiper-wrapper.oneCols .banner-header {
-  font-weight: 400;
+  font-weight: 600;
 }
 .banner-carousel .banners-wrap .swiper-wrapper.oneCols .banner-button a {
   padding: 0.8rem 3rem;
@@ -12079,7 +12079,7 @@ body header.topBarTop.stickyNavbarWrap .topbar {
   margin-left: auto;
 }
 .banner-carousel .banners-wrap .swiper-wrapper:not(.oneCols) .single-banner .text-wrap .banner-header {
-  font-weight: 700;
+  font-weight: 900;
 }
 .banner-carousel .banners-wrap .swiper-wrapper.unequalCols-2-1 .single-banner:nth-child(2n+1) {
   width: calc(67% - 40px) !important;

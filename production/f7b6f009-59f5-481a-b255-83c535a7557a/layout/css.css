@@ -5,6 +5,10 @@
     letter-spacing: 2px !important;
     font-family: 'Courier New', Courier, monospace;
 }
+.main-button{
+    outline: 0.1rem solid var(--bs-primary)!important;
+
+}
 
 
 .card-icing{
@@ -20,7 +24,7 @@
 
 .card-icing:hover {
     background-size: 125%!important;
-    filter: blur(8px);
+    /* filter: blur(8px); */
 }
 .card-icing:hover > .product-icing {
     background-color: rgba(255, 255, 255, 0.9);

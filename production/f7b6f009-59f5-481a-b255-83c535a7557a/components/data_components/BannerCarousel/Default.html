@@ -10,37 +10,37 @@
                     <a v-if="(!(banner.elements.includes(1)) && (banner.buttonLink!=null && banner.buttonLink!='')) || (banner.elements.includes(1) && (banner.buttonText == null || banner.buttonText == '') && (banner.buttonLink!=null && banner.buttonLink!=''))" :href="banner.buttonLink" class="full-link"></a>
                     <div class="d-flex align-items-center h-100">
                         <div v-if="banner.elements.includes(1) && ((banner.text!=null && banner.text!='') || (banner.tagline!=null && banner.tagline!='') || (banner.buttonText!=null && banner.buttonText!='') || (banner.header !=null && banner.header !='') || (banner.subHeader!=null && banner.subHeader!=''))" class="text-wrap px-5 px-lg-4 px-xl-5"
-                             :class="[
-                                {'col-md-5' : banner.elements.includes(2) && this.model.columns === 1},
-                                {'col-md-6' : banner.elements.includes(2) && this.model.columns !== 1},
-                                {'col-md-11' : !banner.elements.includes(2) && banner.textOrientation !== 2},
-                                {'col-md-12' : !banner.elements.includes(2) && banner.textOrientation == 2},
-                                {'offset-md-1' : ((!banner.elements.includes(2) && banner.textOrientation == 0) || (banner.elements.includes(2) && banner.elements[0] == 1)) && this.model.columns === 1}]"
-                             :class="getBannerAlignmentElement(banner.textOrientation)">
-                            <p v-if="(banner.tagline!=null && banner.tagline!='')" class="banner-tagline" :style="'color:'+banner.textColor">{{banner.tagline}}</p>
-                            <h1 v-if="(banner.header!=null && banner.header!='')" class="banner-header" :style="'color:'+banner.textColor">{{banner.header}}</h1>
-                            <p v-if="(banner.subHeader!=null && banner.subHeader!='')" class="banner-subHeader" :style="'color:'+banner.textColor">{{banner.subHeader}}</p>
-                            <div v-if="(banner.text!=null && banner.text!='')" class="banner-text" :style="'color:'+banner.textColor" v-html="banner.text"></div>
-                            <div v-if="banner.buttonText!=null &&  banner.buttonText!=''" class="banner-button">
-                                <a class="btn btn-primary rounded-0 fs-xs " :style="{outline: '0.1rem solid var(--bs-primary)'}" :href="banner.buttonLink">{{banner.buttonText}}</a>
-                            </div>
-                        </div>
-                        <div v-if="banner.elements.includes(2) && (banner.image!=null && banner.image!='')" class="img-wrap px-5 px-lg-4 px-xl-5"
-                             :class="[
-                                {'col-md-6': banner.elements.includes(1)},
-                                {'col-md-12': !banner.elements.includes(1)},
-                                {'order-first': banner.elements[0] !== 1},
-                                {'remove-ps': banner.imageOrientation == 0 && banner.elements[0] !== 1},
-                                {'remove-pe': banner.imageOrientation == 1 && banner.elements[0] === 1}]"
-                             :class="getBannerAlignmentElement(banner.imageOrientation)">
-                            <img class="d-block" :src="banner.image.link" :alt="banner.image.alt">
+                        :class="[
+                        {'col-md-5' : banner.elements.includes(2) && this.model.columns === 1},
+                        {'col-md-6' : banner.elements.includes(2) && this.model.columns !== 1},
+                        {'col-md-11' : !banner.elements.includes(2) && banner.textOrientation !== 2},
+                        {'col-md-12' : !banner.elements.includes(2) && banner.textOrientation == 2},
+                        {'offset-md-1' : ((!banner.elements.includes(2) && banner.textOrientation == 0) || (banner.elements.includes(2) && banner.elements[0] == 1)) && this.model.columns === 1}]"
+                        :class="getBannerAlignmentElement(banner.textOrientation)">
+                        <p v-if="(banner.tagline!=null && banner.tagline!='')" class="banner-tagline" :style="'color:'+banner.textColor">{{banner.tagline}}</p>
+                        <h1 v-if="(banner.header!=null && banner.header!='')" class="banner-header" :style="'color:'+banner.textColor">{{banner.header}}</h1>
+                        <p v-if="(banner.subHeader!=null && banner.subHeader!='')" class="banner-subHeader" :style="'color:'+banner.textColor">{{banner.subHeader}}</p>
+                        <div v-if="(banner.text!=null && banner.text!='')" class="banner-text" :style="'color:'+banner.textColor" v-html="banner.text"></div>
+                        <div v-if="banner.buttonText!=null &&  banner.buttonText!=''" class="banner-button">
+                            <a class="btn rounded-0 fs-xs btn-outline-primary" :style="{outline: '0.1rem solid var(--bs-primary)'}" :href="banner.buttonLink">{{banner.buttonText}}</a>
                         </div>
                     </div>
+                    <div v-if="banner.elements.includes(2) && (banner.image!=null && banner.image!='')" class="img-wrap px-5 px-lg-4 px-xl-5"
+                    :class="[
+                    {'col-md-6': banner.elements.includes(1)},
+                    {'col-md-12': !banner.elements.includes(1)},
+                    {'order-first': banner.elements[0] !== 1},
+                    {'remove-ps': banner.imageOrientation == 0 && banner.elements[0] !== 1},
+                    {'remove-pe': banner.imageOrientation == 1 && banner.elements[0] === 1}]"
+                    :class="getBannerAlignmentElement(banner.imageOrientation)">
+                    <img class="d-block" :src="banner.image.link" :alt="banner.image.alt">
                 </div>
             </div>
-            <div class="swiper-pagination" :class="'swiper-pagination-' + this.model.id"></div>
-            <div class="swiper-button-next" :class="'swiper-button-next-' + this.model.id"></div>
-            <div class="swiper-button-prev" :class="'swiper-button-prev-' + this.model.id"></div>
         </div>
     </div>
+    <!-- <div class="swiper-pagination" :class="'swiper-pagination-' + this.model.id"></div> -->
+    <!-- <div class="swiper-button-next" :class="'swiper-button-next-' + this.model.id"></div>
+    <div class="swiper-button-prev" :class="'swiper-button-prev-' + this.model.id"></div> -->
+</div>
+</div>
 </section>
