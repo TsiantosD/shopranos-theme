@@ -7,16 +7,21 @@
         <h2 class="h4 fw-bold mb-0">{{ categoryTitle }}</h2>
     </div>
     <div class="row gap-4 gap-md-0">
-        <div v-for="(category,index) in this.navigations" class="col-sm-6 col-md-4">
-            <a class="card" :href="category.url">
-                <div class="category-img">
-                    <img v-if="!(category.image === null || category.image === undefined || category.image.link === null || category.image.link === undefined)" :src="getImage(category)" :alt="category?.navigationTitle">
-                    <img v-else class="no-img" :src="getImage(category)" :alt="category?.navigationTitle">
-                </div>
-                <div class="category-title card-body py-4 text-center">
-                    <h3 class="h4">{{category.navigationTitle}}</h3>
-                </div>
-            </a>
+        <div v-for="(category,index) in this.navigations" class="category-card col-sm-6 col-md-4">
+            <a v-if="category.image != null && category.image != null"
+                class="card" :href="category.url"
+                :style="{
+                    backgroundImage: 'url(' + category.image.link + ')',
+                    backgroundSize: 'cover',
+                    height: '16rem',
+                    backgroundPosition: 'center',
+                    textDecoration: 'none',
+            }">
+            <!-- <p>{{category.image}}</p> -->
+            <div class="category-title card-body py-4 text-center">
+                <h3 class="h4">{{category.navigationTitle}}</h3>
+            </div>
+            <a v-else :src="this._getNoImageUrl()" alt="no_image" class="no-img" />
         </div>
     </div>
 </section>
@@ -35,7 +40,7 @@
                 class="card" :href="'/category/' + category.alias"
                 :style="{
                     backgroundImage: 'url(' + category.mediaItem.link + ')',
-                    backgroundSize: '100%',
+                    backgroundSize: 'cover',
                     height: '16rem',
                     backgroundPosition: 'center',
                     textDecoration: 'none',

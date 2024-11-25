@@ -146,6 +146,9 @@ body .filterlist-single_product .card .product-thumb {
 /* CATEGORY CARD */
 .category-card {
     padding: 0 !important;
+    -webkit-transition: all 0.2s ease-in-out!important;
+    transition: all 0.2s ease-in-out!important;
+    /* background-repeat: no-repeat; */
 }
 
 .category-card:hover {
@@ -153,7 +156,8 @@ body .filterlist-single_product .card .product-thumb {
 }
 
 .category-card:hover > .card {
-    background-size: 105% !important;
+    
+    background-size: 120% !important;
 }
 
 .category-card > .card {
@@ -172,7 +176,7 @@ body .filterlist-single_product .card .product-thumb {
     place-content: center;
     color: var(--header-txt-color);
     outline: 0.1rem solid var(--bs-primary);
-    background-color: rgba(0, 0, 0, 0.1) !important;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.55)) !important;
     -webkit-transition: background-color 0.2s ease-in-out !important;
     transition: background-color 0.2s ease-in-out !important;
 }
@@ -203,4 +207,11 @@ body .modal-content .form-label {
     color: var(--bs-primary) !important;
 }
 
-
+.footer-parent a{
+    /* HREF COLOR */
+    color: var(--header-txt-color) !important;
+}
+.footer-parent a:hover{
+    /* HREF COLOR */
+    color: var(--bs-secondary) !important;
+}
