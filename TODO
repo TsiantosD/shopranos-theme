@@ -14,10 +14,12 @@
   - [ ] Add attributes
   - [ ] Add manufacturer
 - [ ] Fix search
+- [ ] Fix login/signup pages styles
 
 ## Components
 - [x] Products carousel
 - [x] Images carousel
+- [ ] Fix brands component (not working in home)
 
 ## Theme (Vape store)
 - [x] Choose color palette (apply it to dashboard)
