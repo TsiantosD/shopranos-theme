@@ -18,7 +18,7 @@
                         {'offset-md-1' : ((!banner.elements.includes(2) && banner.textOrientation == 0) || (banner.elements.includes(2) && banner.elements[0] == 1)) && this.model.columns === 1}]"
                         :class="getBannerAlignmentElement(banner.textOrientation)">
                         <p v-if="(banner.tagline!=null && banner.tagline!='')" class="banner-tagline" :style="'color:'+banner.textColor">{{banner.tagline}}</p>
-                        <h1 v-if="(banner.header!=null && banner.header!='')" class="banner-header" :style="'color:'+banner.textColor">{{banner.header}}</h1>
+                        <h1 v-if="(banner.header!=null && banner.header!='')" class=" hero-text" :style="'color:'+banner.textColor">{{banner.header}}</h1>
                         <p v-if="(banner.subHeader!=null && banner.subHeader!='')" class="banner-subHeader" :style="'color:'+banner.textColor">{{banner.subHeader}}</p>
                         <div v-if="(banner.text!=null && banner.text!='')" class="banner-text" :style="'color:'+banner.textColor" v-html="banner.text"></div>
                         <div v-if="banner.buttonText!=null &&  banner.buttonText!=''" class="">

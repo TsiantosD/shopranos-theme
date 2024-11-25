@@ -9,7 +9,19 @@
     color: var(--header-txt-color) !important;
 }
 
+.hero-text{
+    /* font-family: 'Bebas Neue' !important; */
+    font-size:7rem !important;
+}
 
+.hero-text2{
+    font-family: 'Bebas Neue' !important;
+    font-size:7rem !important;
+}
+.h2-display{
+    font-family: 'Bebas Neue' !important;
+    font-size:3rem !important;
+}
 .banner-carousel:hover {
     cursor: move;
 }

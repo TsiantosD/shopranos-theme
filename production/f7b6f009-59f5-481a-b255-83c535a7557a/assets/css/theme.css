@@ -455,21 +455,22 @@ h3, .h3 {
 }
 
 h4, .h4 {
-  font-weight: 700;
+  /* font-weight: 700; */
+  font-family: 'Bebas Neue' !important;
 }
 @media only screen and (min-width: 1440px) {
   h4, .h4 {
-    font-size: min(max(27px, 27 / 1440 * 100vw), 32px) !important;
+    font-size: min(max(50px, 27 / 1440 * 100vw), 50px) !important;
   }
 }
 @media only screen and (min-width: 744px) and (max-width: 1439px) {
   h4, .h4 {
-    font-size: min(max(20px, 20 / 744 * 100vw), 25px) !important;
+    font-size: min(max(40px, 20 / 744 * 100vw), 40px) !important;
   }
 }
 @media only screen and (max-width: 743px) {
   h4, .h4 {
-    font-size: min(max(18px, 18 / 375 * 100vw), 20px) !important;
+    font-size: min(max(30px, 18 / 375 * 100vw), 30px) !important;
   }
 }
 @media only screen and (min-width: 1921px) {
