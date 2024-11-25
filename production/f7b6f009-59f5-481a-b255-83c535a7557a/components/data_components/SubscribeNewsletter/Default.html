@@ -9,7 +9,7 @@
                 <h3 class="h4 mb-0 text-bold">{{ model.header }}</h3>
             </div>
             <p v-if="subHeader !== null && subHeader !=''" class="mb-4 pb-2 text-muted">{{subHeader}}</p>
-            <form class="subscription-form validate" action="" method="post" name="mc-embedded-subscribe-form" target="_blank" novalidate="">
+            <form class="validate" action="" method="post" name="mc-embedded-subscribe-form" target="_blank" novalidate="">
                 <div class="input-group justify-content-center">
                     <input v-model="email" class="form-control w-100 p-4 border-0" type="email" name="EMAIL" :placeholder="this._company.subDomain+'@gmail.com'" required="">
                     <button @click.prevent="subscribeEmail" class="btn btn-primary mt-4 px-5 py-2" type="submit" name="subscribe">
