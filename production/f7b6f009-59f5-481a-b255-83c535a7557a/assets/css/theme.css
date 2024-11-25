@@ -4015,7 +4015,7 @@ a.btn,
 }
 @media only screen and (min-width: 1133px) and (max-width: 1439px) {
   .product-wrap.card {
-    padding: 1rem !important;
+    /* padding: 1rem !important; */
   }
 }
 

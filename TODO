@@ -1,26 +1,22 @@
 # TODO List
 
 ## Color Palette
-- [ ] Find a color palette
+- [x] Find a color palette
 
 ## Pages
+- [x] Change home
 - [ ] Check checkout flow
-    - [ ] 
-- [ ] Change home
+- [ ] Customize blog
+- [ ] Fix products page
 
 ## Components
-All components should be:
-- a. customized
-- b. compatible with platform features
-- c. responsive to all devices
-
 - [x] Products carousel
-- [ ] Images carousel
+- [x] Images carousel
 
 ## Theme (Vape store)
-- [ ] Choose color palette (apply it to dashboard)
-- [ ] Remove any unecessary/unrelated items (products, categories, images etc)
-- [ ] Add vape products
-- [ ] Add images to match the theme
-- [ ] Change categories
-
+- [x] Choose color palette (apply it to dashboard)
+- [x] Remove any unecessary/unrelated items (products, categories, images etc)
+- [x] Add vape products
+- [x] Add images to match the theme
+- [x] Change categories
+- [ ] Add manufacturers

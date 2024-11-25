@@ -1,18 +1,20 @@
-<div class="card product-wrap card-icing"   :style="{
-    backgroundImage: 'url(' + this._getMediaItem(product.mediaItems)+ ')',
-    backgroundSize: '100%'
- }"
+<a :href="'/product/'+product.alias" class="product-card-link">
+<div class="card product-wrap card-icing"
+    :style="{
+        backgroundImage: 'url(' + this._getMediaItem(product.mediaItems)+ ')',
+        backgroundSize: '100%'
+    }"
 >
     <div v-if="product.additionalFeatures.icoTags !== null" class="product-badge" v-html="this._getBadges(product)">
     </div>
     <div class="product-thumb" style="height: 15rem;">
-        <a :href="'/product/'+product.alias"class="img-wrap"></a>
-            </a>
+        <a :href="'/product/'+product.alias" class="img-wrap">
             <!-- Shopping Lists -->
             <button v-if="this._resolveModules('shoppinglists')" class="btn btn-light product-list"
-                @click="handleAddToListModal()" :class="checkStyle()">
+            @click="handleAddToListModal()" :class="checkStyle()">
                 <span class="s-heart large"><span>##ShoppingLists##</span></span>
             </button>
+        </a>
     </div>
     <div class="product-info product-icing">
         <h3 class="product-title p">
@@ -27,6 +29,7 @@
         </div>
     </div>
 </div>
+</a>
 
 <div ref="addToList" class="shoppingList-modal modal fade" v-bind:class="{show:showAddToListModal}">
     <div class="modal-dialog modal-dialog-centered modal-lg">

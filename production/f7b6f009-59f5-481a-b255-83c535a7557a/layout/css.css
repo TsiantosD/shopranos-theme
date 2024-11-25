@@ -5,11 +5,15 @@
     letter-spacing: 2px !important;
     font-family: 'Courier New', Courier, monospace;
 }
+
 .main-button{
     outline: 0.1rem solid var(--bs-primary)!important;
 
 }
 
+.product-card-link:hover {
+    text-decoration: none;
+}
 
 .card-icing{
     outline: 0.1rem solid var(--bs-primary);
@@ -38,14 +42,8 @@
     transition: all 0.2s ease-in-out!important; /* Add standard transition for all states */
 }
 
-/* .standard-btns > [class^=s-] */
-/* .standard-btns > [class*=" s-"], */
-/* .standard-btns > span::before, */
-.navbar-tool.btn,
-.s-notification,
-#navcart-icon {
-/* [class^=s-], */
-/* [class*=" s-"] */
+/* Navbar icons */
+.navbar-tool.btn, .s-notification, #navcart-icon {
     color: var(--header-txt-color) !important;
 }
 
@@ -61,4 +59,8 @@
 
 .border-theme.navbar-search::placeholder {
     color: var(--header-txt-color) !important;
+}
+
+.category-title {
+    color: var(--bs-secondary-color) !important;
 }
