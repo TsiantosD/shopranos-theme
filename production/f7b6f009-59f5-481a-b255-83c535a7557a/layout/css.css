@@ -9,19 +9,6 @@
     color: var(--header-txt-color) !important;
 }
 
-
-.banner-carousel:hover {
-    cursor: move;
-}
-
-.main-text {
-    color: rgb(24, 0, 0) !important;
-    font-size: 20px !important;
-    font-weight: 1000 !important;
-    letter-spacing: 2px !important;
-    font-family: 'Courier New', Courier, monospace;
-}
-
 .main-button {
     outline: 0.1rem solid var(--bs-primary) !important;
 }
@@ -35,7 +22,24 @@
     color: var(--header-txt-color) !important;
 }
 
+/* BANNER  */
+.banner-carousel:hover {
+    cursor: move;
+}
+
+.banner-header {
+    transition: all 1s ease-in-out;
+}
+
 /* PRODUCT CARD */
+.main-text {
+    color: rgb(24, 0, 0) !important;
+    font-size: 20px !important;
+    font-weight: 1000 !important;
+    letter-spacing: 2px !important;
+    font-family: 'Courier New', Courier, monospace;
+}
+
 .product-card-link:hover {
     text-decoration: none;
 }
