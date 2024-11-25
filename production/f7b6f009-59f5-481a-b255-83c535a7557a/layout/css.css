@@ -1,8 +1,20 @@
+/* NAVBAR */
+/* Navbar icons */
+.navbar-tool.btn, .s-notification, #navcart-icon {
+    color: var(--header-txt-color) !important;
+}
+
+.navbar-search {
+    background-color: var(--header-bg-color) !important;
+    color: var(--header-txt-color) !important;
+}
+
+
 .banner-carousel:hover {
     cursor: move;
 }
 
-.main-text{
+.main-text {
     color: rgb(24, 0, 0) !important;
     font-size: 20px !important;
     font-weight: 1000 !important;
@@ -10,30 +22,40 @@
     font-family: 'Courier New', Courier, monospace;
 }
 
-.main-button{
-    outline: 0.1rem solid var(--bs-primary)!important;
-
+.main-button {
+    outline: 0.1rem solid var(--bs-primary) !important;
 }
 
+.border-theme.navbar-search {
+    border-color: var(--header-txt-color) !important;
+    color: var(--header-txt-color) !important;
+}
+
+.border-theme.navbar-search::placeholder {
+    color: var(--header-txt-color) !important;
+}
+
+/* PRODUCT CARD */
 .product-card-link:hover {
     text-decoration: none;
 }
 
-.card-icing{
+.card-icing {
     outline: 0.1rem solid var(--bs-primary);
     box-sizing: border-box;
     margin-top: 1rem;
-    padding: 0!important;
-    background-size: 100% !important;
+    padding: 0 !important;
+    background-size: cover !important;
     background-position: center;
-    -webkit-transition: all 0.2s ease-in-out!important;
-    transition: all 0.2s ease-in-out!important;
+    background-repeat: no-repeat;
+    -webkit-transition: all 0.2s ease-in-out !important;
+    transition: all 0.2s ease-in-out !important;
 }
 
 .card-icing:hover {
-    background-size: 125%!important;
-    /* filter: blur(8px); */
+    transform: scale(1.02);
 }
+
 .card-icing:hover > .product-icing {
     background-color: rgba(255, 255, 255, 0.9);
 }
@@ -46,36 +68,22 @@
     transition: all 0.2s ease-in-out!important;
 }
 
-/* Navbar icons */
-.navbar-tool.btn, .s-notification, #navcart-icon {
-    color: var(--header-txt-color) !important;
+/* Remove image border */
+body .filterlist-single_product .card .product-thumb {
+    border: none;
 }
 
-.navbar-search {
-    background-color: var(--header-bg-color) !important;
-    color: var(--header-txt-color) !important;
-}
-
-.border-theme.navbar-search {
-    border-color: var(--header-txt-color) !important;
-    color: var(--header-txt-color) !important;
-}
-
-.border-theme.navbar-search::placeholder {
-    color: var(--header-txt-color) !important;
-}
-
+/* CATEGORY CARD */
 .category-card {
     padding: 0 !important;
 }
 
 .category-card:hover {
-    background-size: 125% !important;
     backdrop-filter: blur(8px) !important;
 }
 
 .category-card:hover > .card {
-    background-size: 125% !important;
+    background-size: 105% !important;
 }
 
 .category-card > .card {

@@ -5,9 +5,15 @@
 
 ## Pages
 - [x] Change home
-- [ ] Check checkout flow
+- [x] Check checkout flow
+  - [x] Add payment method
+  - [x] Add shipping
+  - [ ] Change styles
 - [ ] Customize blog
-- [ ] Fix products page
+- [x] Fix products page
+  - [ ] Add attributes
+  - [ ] Add manufacturer
+- [ ] Fix search
 
 ## Components
 - [x] Products carousel
@@ -19,4 +25,4 @@
 - [x] Add vape products
 - [x] Add images to match the theme
 - [x] Change categories
-- [ ] Add manufacturers
+- [x] Add manufacturers
