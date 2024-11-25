@@ -10,8 +10,12 @@
     <div class="product-thumb" style="height: 15rem;">
         <a :href="'/product/'+product.alias" class="img-wrap">
             <!-- Shopping Lists -->
-            <button v-if="this._resolveModules('shoppinglists')" class="btn btn-light product-list"
-            @click="handleAddToListModal()" :class="checkStyle()">
+            <button v-if="this._resolveModules('shoppinglists')" class="btn btn-light product-list product-add-to-list"
+            @click="(event) => {
+                event.preventDefault();
+                handleAddToListModal();
+            }"
+            :class="checkStyle()">
                 <span class="s-heart large"><span>##ShoppingLists##</span></span>
             </button>
         </a>
