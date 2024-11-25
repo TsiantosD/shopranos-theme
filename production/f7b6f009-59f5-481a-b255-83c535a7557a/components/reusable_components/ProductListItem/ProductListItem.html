@@ -22,8 +22,8 @@
                 :href="'/product/'+product.alias">{{product.productVariants[0].title}}</a>
             <a class="main-text" v-else :href="'/product/'+product.alias">{{product.title}}</a>
         </h3>
-        <span v-if="product.productVariants.length>0 && product.productVariants[0].sku!=null"
-            class="product-sku">{{product.productVariants[0].sku}}</span>
+        <!-- <span v-if="product.productVariants.length>0 && product.productVariants[0].sku!=null"
+            class="product-sku">{{product.productVariants[0].sku}}</span> -->
         <div class="product-cart">
             <addtocart :model="product":quantityActive="false":isCalculated="isCalculated"></addtocart>
         </div>

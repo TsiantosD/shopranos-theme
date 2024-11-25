@@ -237,18 +237,18 @@
                             </div>
                         </div>
                     </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Product Description -->
     <div v-if="productData.description!=null && productData.description!='' " class="container product-desc">
         <h2 class="product-desc__title mb-4">##Description##</h2>
         <div class="product-desc__text" v-html="productData.description"></div>
     </div>
     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <div v-if="masterRelatedProducts.length > 0" class="master-related">
         <table>
