@@ -35,6 +35,76 @@
     color: var(--header-txt-color) !important;
 }
 
+/* BANNER */
+.header-button {
+    /* --color: var(--swiper-theme-color); */
+    padding: 0.8em 1.7em !important;
+    background-color: transparent  !important;
+    border-radius: .3em !important;
+    position: relative !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    transition: .5s !important;
+    font-weight: 400 !important;
+    font-size: 17px !important;
+    border: 1px solid !important;
+    font-family: inherit !important;
+    text-transform: uppercase !important;
+    color: var(--color) !important;
+    backdrop-filter: blur(10px) !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 1 !important;
+}
+
+.header-button::before, .header-button::after {
+    content: '' !important;
+    display: block !important;
+    width: 50px !important;
+    height: 50px !important;
+    transform: translate(-50%, -50%) !important;
+    position: absolute !important;
+    border-radius: 50% !important;
+    z-index: -1 !important;
+    background-color: var(--color) !important;
+    transition: 1s ease !important;
+}
+
+.header-button::before {
+    top: -1em !important;
+    left: -1em !important;
+}
+
+.header-button::after {
+    left: calc(100% + 1em) !important;
+    top: calc(100% + 1em) !important;
+}
+
+.header-button:hover::before, .header-button:hover::after {
+    height: 410px !important;
+    width: 410px !important;
+}
+
+.header-button >a {
+    color: var(--color) !important;
+    text-decoration: none !important;
+    font-weight: 800 !important;
+}
+
+.header-button:hover {
+    color: rgb(10, 25, 30) !important;
+}
+.header-button:hover > a {
+    color: rgb(10, 25, 30) !important;
+}
+
+.header-button:active {
+    filter: brightness(.8) !important;
+}
+.header-button:active > a {
+    filter: brightness(.8) !important;
+}
+
+
 /* PRODUCT CARD */
 .product-card-link:hover {
     text-decoration: none;
@@ -100,86 +170,17 @@ body .filterlist-single_product .card .product-thumb {
     width: 100%;
     height: 100%;
     place-content: center;
-    background-color: rgba(0, 0, 0, 0) !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
     -webkit-transition: background-color 0.2s ease-in-out !important;
     transition: background-color 0.2s ease-in-out !important;
 }
 
 .category-card:hover > .card > .category-title > h3 {
-    background-color: rgba(0, 0, 0, 0.2) !important;
-    backdrop-filter: blur(8px) !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(3px) !important;
 }
 
-
-
-
-
-/* From Uiverse.io by nikk7007 */ 
-.header-button {
-    /* --color: var(--swiper-theme-color); */
-    padding: 0.8em 1.7em !important;
-    background-color: transparent  !important;
-    border-radius: .3em !important;
-    position: relative !important;
-    overflow: hidden !important;
-    cursor: pointer !important;
-    transition: .5s !important;
-    font-weight: 400 !important;
-    font-size: 17px !important;
-    border: 1px solid !important;
-    font-family: inherit !important;
-    text-transform: uppercase !important;
-    color: var(--color) !important;
-    backdrop-filter: blur(10px) !important;
-    background-color: rgba(0, 0, 0, 0.5) !important;
-    z-index: 1 !important;
-   }
-   
-   .header-button::before, .header-button::after {
-    content: '' !important;
-    display: block !important;
-    width: 50px !important;
-    height: 50px !important;
-    transform: translate(-50%, -50%) !important;
-    position: absolute !important;
-    border-radius: 50% !important;
-    z-index: -1 !important;
-    background-color: var(--color) !important;
-    transition: 1s ease !important;
-   }
-   
-   .header-button::before {
-    top: -1em !important;
-    left: -1em !important;
-   }
-   
-   .header-button::after {
-    left: calc(100% + 1em) !important;
-    top: calc(100% + 1em) !important;
-   }
-   
-   .header-button:hover::before, .header-button:hover::after {
-    height: 410px !important;
-    width: 410px !important;
-   }
-   
-   .header-button >a{   
-    color: var(--color) !important;
-    text-decoration: none !important;
-    font-weight: 800 !important;
-   }
-
-   .header-button:hover {
-    color: rgb(10, 25, 30) !important;
-   }
-   .header-button:hover > a{
-    color: rgb(10, 25, 30) !important;
-   }
-   
-   .header-button:active {
-    filter: brightness(.8) !important;
-   }
-   .header-button:active > a{
-    filter: brightness(.8) !important;
-   }
-   
+/* NEWSLETTER */
+body .text-muted {
+    color: var(--body-primary-txt-color) !important;
+}
