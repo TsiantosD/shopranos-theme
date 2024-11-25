@@ -20,10 +20,10 @@
     box-sizing: border-box;
     margin-top: 1rem;
     padding: 0!important;
-    background-size: 100%!important;
+    background-size: 100% !important;
     background-position: center;
     -webkit-transition: all 0.2s ease-in-out!important;
-    transition: all 0.2s ease-in-out!important; /* Add standard transition for all states */
+    transition: all 0.2s ease-in-out!important;
 }
 
 .card-icing:hover {
@@ -39,7 +39,7 @@
     padding: 1rem;
     backdrop-filter: blur(8px);
     -webkit-transition: all 0.2s ease-in-out!important;
-    transition: all 0.2s ease-in-out!important; /* Add standard transition for all states */
+    transition: all 0.2s ease-in-out!important;
 }
 
 /* Navbar icons */
@@ -61,6 +61,39 @@
     color: var(--header-txt-color) !important;
 }
 
-.category-title {
-    color: var(--bs-secondary-color) !important;
+.category-card {
+    padding: 0 !important;
+}
+
+.category-card:hover {
+    background-size: 125% !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+.category-card:hover > .card {
+    background-size: 125% !important;
+}
+
+.category-card > .card {
+    -webkit-transition: all 0.2s ease-in-out !important;
+    transition: all 0.2s ease-in-out !important;
+    padding: 0 !important;
+}
+
+.category-card > .card > .category-title {
+    padding: 0 !important;
+}
+
+.category-card > .card > .category-title > h3 {
+    width: 100%;
+    height: 100%;
+    place-content: center;
+    background-color: rgba(0, 0, 0, 0) !important;
+    -webkit-transition: background-color 0.2s ease-in-out !important;
+    transition: background-color 0.2s ease-in-out !important;
+}
+
+.category-card:hover > .card > .category-title > h3 {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    backdrop-filter: blur(8px) !important;
 }

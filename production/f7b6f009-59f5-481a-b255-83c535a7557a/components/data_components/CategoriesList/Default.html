@@ -30,16 +30,20 @@
         <h2 class="h4 fw-bold mb-0">{{ categoryTitle }}</h2>
     </div>
     <div class="row gap-4 gap-md-0">
-        <div v-for="(category,index) in this.categories" class="col-sm-6 col-md-4">
-            <a class="card" :href="'/category/' + category.alias">
-                <div class="category-img">
-                    <img v-if="category.mediaItem != null && category.mediaItem.link != null" :src="category.mediaItem.link" :alt="category.alias" @error="this._handleImageError">
-                    <img v-else :src="this._getNoImageUrl()" alt="no_image" class="no-img" />
-                </div>
+        <div v-for="(category,index) in this.categories" class="category-card col-sm-6 col-md-4">
+            <a v-if="category.mediaItem != null && category.mediaItem.link != null"
+                class="card" :href="'/category/' + category.alias"
+                :style="{
+                    backgroundImage: 'url(' + category.mediaItem.link + ')',
+                    backgroundSize: '100%',
+                    height: '16rem',
+                    backgroundPosition: 'center',
+            }">
                 <div class="category-title card-body py-4 text-center">
                     <h3 class="h4">{{category.title}}</h3>
                 </div>
             </a>
+            <a v-else :src="this._getNoImageUrl()" alt="no_image" class="no-img" />
         </div>
     </div>
 </section>
